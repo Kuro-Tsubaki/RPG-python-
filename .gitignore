@@ -1,0 +1,14 @@
+# On ignore le dossier Autres et tout son contenu
+Autres/
+*.png
+*.txt
+# On ignore tous les fichiers de sauvegarde (extensions .json)
+*.json
+
+# On ignore les fichiers spécifiques
+ideas.txt
+test tqt.py
+
+# Bonus : On ignore les dossiers poubelles de Python
+__pycache__/
+.vscode/
