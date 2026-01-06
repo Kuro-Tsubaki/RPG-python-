@@ -3,7 +3,7 @@ from Game.fight_manager import fight
 from Game.inventory import Inventory
 from Game.utils import display_equipment, display_equipement_enemy
 from Game.save_load import save_game, load_game, get_save_file, restore_player_data
-from Game.enemy_spawner import generate_random_enemy
+from Game.enemy_spawner import generate_random_enemy, get_enemy_actual_level
 from Game.items import weapons, armors
 import random
 import copy
@@ -74,8 +74,27 @@ class Game:
 
                     # Ajout compteur bestiary
                     self.player.bestiary[enemy.name] += 1
+                    
+                    #C. Gain d'xp
+                    base_xp = enemy.base_xp
+                    
+                    if enemy.level > self.player.level: # ELITE
+                        rank_multiplier = 2.0
+                        random_bonus = int(self.player.max_xp * 0.10) # 10% de l'XP max du joueur
 
-                    #C. Affichage succès
+                    elif enemy.level < int(self.player.level * 0.7): # TRASH
+                        rank_multiplier = 0.6
+                        random_bonus = 0
+
+                    else: # STANDARD
+                        rank_multiplier = 1.0
+                        random_bonus = random.randint(1, 5)
+                        
+                    # 3. Calcul final et attribution
+                    total_xp = int((base_xp * rank_multiplier) + random_bonus)
+                    self.player.gain_xp(total_xp)
+                    
+                    #D. Affichage succès
                     print(f"Progression : {self.player.bestiary[enemy.name]} {enemy.name}s vaincus.")
                     self.player.health = self.player.max_health #vie à 100%
                     return False
