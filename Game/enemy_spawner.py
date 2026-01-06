@@ -25,7 +25,11 @@ def get_enemy_actual_level(player_level):
     if roll < 0.20: 
         min_level_range = int(player_level * 0.5)
         max_level_range = int(player_level * 0.7)
-        level = random.randint(max(1, min_level_range), max_level_range)
+        #sécurité pour éviter que le chiffre soit inférieur à 1 sinon erreur
+        a = max(1, min_level_range)
+        b = max(1, max_level_range)
+        
+        level = random.randint(a,b)
         print("-> Rencontre : Ennemi Facile (Trash Mob).")
 
     # 70% de chance : Ennemi Normal
