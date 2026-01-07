@@ -1,7 +1,7 @@
 from Game.character import characters
 from Game.fight_manager import fight
 from Game.inventory import Inventory
-from Game.utils import display_equipment, display_equipement_enemy
+from Game.utils import display_entity_stats
 from Game.save_load import save_game, load_game, get_save_file, restore_player_data
 from Game.enemy_spawner import generate_random_enemy, get_enemy_actual_level
 from Game.items import weapons, armors
@@ -34,7 +34,7 @@ class Game:
                 # Affichage des informations du personnage sélectionné
                 print(f"\nVous avez choisi: {self.player.name}")
                 print(f"Santé: {self.player.health} | Force: {self.player.strength}")
-                display_equipment(self.player)
+                display_entity_stats(self.player)
                 break
             print("Choix invalide ! Veuillez entrer 1, 2 ou 3.")
 
@@ -42,24 +42,21 @@ class Game:
     #Système de combat (duel)    
     def battle(self):
         print("Fonctionnalité combat:")
-        display_equipment(self.player) #Affiche l'équipement du joueur
-        enemy = generate_random_enemy(self.player.level) #crée un ennemi selon la fonction "generate_random_enemy"
-        print(f"un {enemy.name} vous fait face de {enemy.max_health} HP")
-        display_equipement_enemy(enemy) #affiche l'équipement de l'ennemi qui est apparu
-        ####refonte de la fonction display_equipement####
+        display_entity_stats(self.player)
+        print(f"Vous avez {self.player.health}/{self.player.max_health} HP.")
+        enemy = generate_random_enemy(self.player.level)
+        print(f"Un {enemy.name} de {enemy.max_health} HP vous fait face.")
+        display_entity_stats(enemy)
+        
         
         #Boucle combat continue if health > 0
         while self.player.health > 0 and enemy.health > 0 :
-            #Début boucle combat choix :
             print("1- Attaquer")
             print("2- Fuir")
-            combat_choice = input("Votre choix : ")
-            print("\n")
+            combat_choice = input("Votre choix : \n")
             
-            #1. Choix de combattre, le joueur attaque while pv > 0
             if combat_choice == "1":
                 fight(self.player, enemy)
-                
                 #2. Check PV, Si enemy.health <= 0 : break
                 if enemy.health <= 0:
                     
@@ -107,7 +104,7 @@ class Game:
             elif combat_choice == "2":
                 if random.random() < 0.5: #50% fuite de base
                     print("vous avez fuit")
-                    self.player.health = self.player.max_health #vie à 100%
+                    self.player.health = self.player.max_health / 2#vie à 100%
                     return False
                 #Si fuite raté l'enemie attaque
                 else:
@@ -156,7 +153,7 @@ class Game:
                 print(f"Inventaire: {self.inventory.items}")
             
             elif choice == "3":
-                display_equipment(self.player)
+                display_entity_stats(self.player)
             
             elif choice == "4":
                 pass

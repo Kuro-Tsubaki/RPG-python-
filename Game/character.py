@@ -28,19 +28,19 @@ class Entity:
     def gain_xp(self, amount):
         self.xp += amount
         print(f"✨ XP : +{amount} (Total: {self.xp}/{self.max_xp})")
-        # Utilisation d'une boucle while au cas où on gagne assez d'XP pour prendre 2 niveaux d'un coup
+        # Cap for not skipping two level in one row
         while self.xp >= self.max_xp:
             self.level_up()
 
     def level_up(self):
         self.xp -= self.max_xp
         self.level += 1
-        # On augmente le prochain palier de 25%
+        #Next level 25% harder
         self.max_xp = int(self.max_xp * 1.25)
         
-        # Augmentation des stats
+        # Up stats
         self.max_health += 15
-        self.health = self.max_health # Soin complet au passage de niveau
+        self.health = self.max_health
         self.strength += 2
         
         print(f"\n🌟 PASSAGE AU NIVEAU {self.level} ! 🌟")
@@ -49,11 +49,11 @@ class Entity:
         
 class Character(Entity):
     def __init__(self, name, health, strength, main_hand:Weapon=None, off_hand:Weapon=None,
-                 helmet:Armor=None, chestplate:Armor=None, leggings:Armor=None, boots:Armor=None, inventory=[]):
+                 helmet:Armor=None, chestplate:Armor=None, leggings:Armor=None, boots:Armor=None, inventory=[],level=1, base_xp=0):
         super().__init__(name, health, strength, main_hand, off_hand,
-                        helmet, chestplate, leggings, boots, inventory, )
+                        helmet, chestplate, leggings, boots, inventory,level=level, base_xp=base_xp, )
         
-# Création des personnages jouables
+
 characters = {
 "warrior" : Character("Guerrier", 100, 7,
                    main_hand=weapons["basic_sword"], off_hand=weapons["basic_shield"],
@@ -79,12 +79,12 @@ characters = {
 
 
 class Enemy(Entity):
-    def __init__(self, name, health, strength, main_hand=None, off_hand=None,
-                 helmet=None, chestplate=None, leggings=None, boots=None, level=1, base_xp=0): # Ajoute base_xp ici
+    def __init__(self, name, health, strength, main_hand:Weapon=None, off_hand:Weapon=None,
+                 helmet:Armor=None, chestplate:Armor=None, leggings:Armor=None, boots:Armor=None, level=1, base_xp=0):
         super().__init__(name, health, strength, main_hand, off_hand,
-                        helmet, chestplate, leggings, boots, level=level, base_xp=base_xp) # Et ici
+                        helmet, chestplate, leggings, boots, level=level, base_xp=base_xp)
 
-# Création des ennemis
+
 enemies = {
 "gobelin" : Enemy("Gobelin", 45, 5, main_hand=weapons["poignard"], level=1, base_xp=5)
 ,"orque" : Enemy("Orque", 70, 15, main_hand=weapons["gourdin"], off_hand=weapons["basic_shield"], level=1, base_xp=15)

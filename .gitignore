@@ -8,7 +8,7 @@ Autres/
 # On ignore les fichiers spécifiques
 ideas.txt
 test tqt.py
-
+__init__.py
 # Bonus : On ignore les dossiers poubelles de Python
 __pycache__/
 .vscode/
