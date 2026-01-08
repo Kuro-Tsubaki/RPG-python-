@@ -49,45 +49,39 @@ def get_enemy_actual_level(player_level):
 
     return max(1, level) #security
 
-# 2. La Fonction d'Apparition (Modifiée)
-# NOTE: Cette fonction doit prendre le 'player_level' en argument, 
-# car elle ne fera plus partie de la classe Game (plus de 'self').
-def generate_random_enemy(player_level):
-    # 1. On récupère les poids via notre nouvelle fonction propre
-    current_weights = get_weights_for_level(player_level)
+def scale_enemy(enemy, target_level):
     
-    # 2. Tirage de l'espèce (très court !)
-    enemy_key = random.choices(list(current_weights.keys()), weights=list(current_weights.values()), k=1)[0]
+    levels_gained = target_level - enemy.level
     
-    # 3.1 || scaling dynamique || Appel de la fonction get_enemy_actual_level
-    enemy_actual_level = get_enemy_actual_level(player_level)
-    
-    # 3.2 Instance de "enemy_actual_level"
-    # Création de l'enemy qu'on va affronter, après avoir scale
-    enemy_instance = copy.deepcopy(enemies[enemy_key])
-    
-    # 3.3 Calcul de la différence de niveau entre instance et niveau du modèle basique (level=1)
-    levels_gained = enemy_actual_level - enemy_instance.level
-    
-    # Étape 3.4 : Appliquer le Scaling si l'ennemi est d'un niveau supérieur au modèle
     if levels_gained > 0:
-        
-        # Scaling des PV
+        # Calculs
         hp_scaling = levels_gained * HP_MULTIPLIER
-        enemy_instance.max_health += hp_scaling
-        enemy_instance.health += hp_scaling # Important : PV actuels aussi !
+        str_scaling = levels_gained * STR_MULTIPLIER
         
-        # Scaling de la Force
-        strength_scaling = levels_gained * STR_MULTIPLIER
-        enemy_instance.strength += strength_scaling
+        # Application
+        enemy.max_health += hp_scaling
+        enemy.health = enemy.max_health # Soin complet lors du scaling
+        enemy.strength += str_scaling
+        enemy.level = target_level
         
-        print(f"-> {enemy_instance.name} ajusté au Niveau {enemy_actual_level}: HP +{hp_scaling}, Force +{strength_scaling}")
-
-    # Étape 3.5 : Finaliser le niveau de l'instance
-    # Même si levels_gained était 0, l'instance doit avoir le bon niveau affiché.
-    enemy_instance.level = enemy_actual_level
+        return hp_scaling, str_scaling
+    return 0, 0    
     
-    # 4. Retourner la copie de l'ennemi
-    return enemy_instance
+def generate_random_enemy(player_level):
+    # 1. Préparation des données
+    weights = get_weights_for_level(player_level)
+    enemy_key = random.choices(list(weights.keys()), weights=list(weights.values()), k=1)[0]
+    target_level = get_enemy_actual_level(player_level)
+    
+    # 2. Création de la copie
+    new_enemy = copy.deepcopy(enemies[enemy_key])
+    
+    # 3. Application du scaling (On appelle notre "sous-chef")
+    hp_plus, str_plus = scale_enemy(new_enemy, target_level)
+    
+    if hp_plus > 0:
+        print(f"-> {new_enemy.name} (Niv {target_level}) : +{hp_plus} HP, +{str_plus} STR")
+        
+    return new_enemy
 
     
