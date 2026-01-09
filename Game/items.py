@@ -1,18 +1,17 @@
 
 
 class Item:
-    def __init__(self, name, description=""):
+    def __init__(self, name, stat_to_fix=None, description=""):
         self.name = name
         self.description = description
-#-------------------------------------------------
-# Les armes héritent d'Item et ajoutent des stats d'attaque
-#-------------------------------------------------
+        self.stat_to_fix = stat_to_fix
+
 class Weapon(Item):
     def __init__(self, name, attack, description=""):
         super().__init__(name, description)
         self.attack = attack
         
-# --- Armes ---
+# --- Weapons ---
 weapons = {
 "basic_sword" : Weapon("Épée Basique", 10, "Une épée simple mais efficace")
 ,"basic_shield" : Weapon("Bouclier Basique", 5,  "Un bouclier en bois renforcé")
@@ -23,23 +22,16 @@ weapons = {
 ,"poignard" : Weapon("Poignard", 10, "Une lame courte et rapide")
 ,"gourdin" : Weapon("Gourdin", 20, "Une massue lourde et brutale")
 ,"axe" : Weapon("Hache", 25, "Une hache de guerre imposante")
-    
-    
-    
-    
+ 
 }
 
-# Les armures héritent d'Item et ajoutent des stats de défense
-#-------------------------------------------------
-# les armures héritent d'Item et ajoutent des stats de défense
-#-------------------------------------------------
 class Armor(Item):
     def __init__(self, name, defense, description=""):
         super().__init__(name, description)
         self.defense = defense
 
     
-# --- Armures ---
+# --- Armors ---
 armors = {
 "helmet" : Armor("Casque", 5, "Protection pour la tête")
 ,"chestplate" : Armor("Plastron", 15,  "Armure de torse robuste")
@@ -50,19 +42,18 @@ armors = {
 }
 
 
-#-------------------------------------------------
-# Les objets utilisables héritent d'Item et ajoutent des effets
-#-------------------------------------------------
 class UseableItem(Item):
-    def __init__(self, name, effect, description=""):
-        super().__init__(name, description)
+    def __init__(self, name, effect, stat_to_fix ,description=""):
+        super().__init__(name, description,stat_to_fix)
         self.effect = effect
         
-# --- Objets Utilisables ---
+        
+# --- Useable Item ---
 potions = {
-"health_potion" : UseableItem("Potion de Santé", 25 , "Restaure 25 points de vie")
-,"strenght_potion" : UseableItem("Potion de Force", 5 , "Augmente la force de 5 points pour le combat en cours")
-,"mana_potion" : UseableItem("potion de mana" ,10 , "Redonne du mana")
+"health_potion" : UseableItem("Potion de Santé", 25 , "health", "Restaure 25 points de vie")
+,"strength_potion" : UseableItem("Potion de Force", 5 , "strength","Augmente la force de 5 points pour le combat en cours")
+,"mana_potion" : UseableItem("potion de mana" ,10 , "mana","Redonne du mana")
+,"luck_potion" : UseableItem("Potion d'amélioration de chance", 30,"luck", "Augmente la chance")
     
 }
 

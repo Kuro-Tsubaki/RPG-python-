@@ -47,6 +47,21 @@ class Entity:
         print(f"Stats : ❤️ PV {self.max_health} | 💪 Force {self.strength}")
         print(f"🆙 Prochain niveau à : {self.max_xp} XP\n")
         
+    def use_item(self, item):
+        
+        item_stat = getattr(self,item.stat_to_fix)
+        up_stat = item_stat + item.effect
+        if item.stat_to_fix == "health":
+            up_stat = min(up_stat, self.max_health)
+        setattr(self, item.stat_to_fix, up_stat)
+        
+        print(f"-> {self.name} utilise {item.name} (+{item.effect} {item.stat_to_fix})")
+        self.inventory.remove(item)
+        item_stat_after_use = getattr(self, item.stat_to_fix)
+        print(f"{self.name} utilise {item.name} !")
+        print(f"{item.stat_to_fix} : {item_stat} -> {item_stat_after_use}")
+            
+                
 class Character(Entity):
     def __init__(self, name, health, strength, main_hand:Weapon=None, off_hand:Weapon=None,
                  helmet:Armor=None, chestplate:Armor=None, leggings:Armor=None, boots:Armor=None, inventory=[],level=1, base_xp=0):
@@ -58,7 +73,7 @@ characters = {
 "warrior" : Character("Guerrier", 100, 7,
                    main_hand=weapons["basic_sword"], off_hand=weapons["basic_shield"],
                    helmet=armors["helmet"], chestplate=armors["chestplate"], leggings=armors["leggings"], boots=armors["boots"],
-                   inventory=[potions["health_potion"], potions["strenght_potion"]])
+                   inventory=[potions["health_potion"], potions["strength_potion"]])
 
 ,"mage" : Character("Mage", 70, 8,
                 main_hand=weapons["magic_staff"], off_hand=weapons["spell_book"],

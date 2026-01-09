@@ -5,22 +5,21 @@ def fight(striker:Entity, defender:Entity):
     # ======================== #
     # === Case - Attaque === #
     # ======================== #
-    #  Calcul de la force du stiker
-    # 1. Force de base
-    brut_damage = striker.strength #Stockage force striker
+    
+    
+    brut_damage = striker.strength
     attack_display =  striker.name + " inflige  *totdamage*  damage \n"  + " "+str(striker.strength) + " force brut \n"
     #Replace *totdomage* p/ tout ce que possède le striker qui a de la force
-    # A. Force de base + main principal si équipée
+    
     if striker.main_hand:
         brut_damage += striker.main_hand.attack
         attack_display += " " + str(striker.main_hand.attack) + " force main principale \n"
-    # B. Pareil avec la main secondaire
     if striker.off_hand:
         brut_damage += striker.off_hand.attack
         attack_display += " " + str(striker.off_hand.attack) + " force main secondaire \n"
     
     # ----------------
-    # 4. dice roll DnD
+    # Dice roll DnD
     # ----------------
     
     dice_roll = random.randint(1, 20)
@@ -38,10 +37,9 @@ def fight(striker:Entity, defender:Entity):
     
     
     # --------
-    # Maitrise
+    # Mastery
     # --------
-    # 3. Si maitrise, ajout de dégat 
-    # A. Vérification du Bonus de Maîtrise (si l'attaquant est le joueur)
+    
     if isinstance(striker, Character) and isinstance(defender, Entity):
         
         kill_count = striker.bestiary.get(defender.name, 0)
@@ -54,12 +52,12 @@ def fight(striker:Entity, defender:Entity):
             brut_damage *= 1.5 # Bonus x1.5
             print("⚔️ Bonus de Maîtrise : +50% Dégâts.")
             
-    #int : entier            
+            
     brut_damage = max(1,int(brut_damage))        
     
-    # ======================== #
-    # === Case - Defense === #
-    # ======================== #
+    # ===================== #
+    # ===== Defense ===== #
+    # ===================== #
     
     defender_defense = 0
     defense_display = ""

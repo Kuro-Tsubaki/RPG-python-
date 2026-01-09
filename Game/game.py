@@ -1,4 +1,4 @@
-from Game.character import characters
+from Game.character import characters, Entity 
 from Game.fight_manager import fight
 from Game.inventory import Inventory
 from Game.utils import display_entity_stats
@@ -53,6 +53,7 @@ class Game:
         while self.player.health > 0 and enemy.health > 0 :
             print("1- Attaquer")
             print("2- Fuir")
+            print("3- Inventaire")
             combat_choice = input("Votre choix : \n")
             
             if combat_choice == "1":
@@ -110,6 +111,10 @@ class Game:
                 else:
                     print("l'ennemi vous bloque la route \n")
                     fight(enemy, self.player)                
+            elif combat_choice == "3":
+                self.show_inventory()
+                if not self.player.use_item:
+                    continue 
             else:
                 print("choix invalide")    
         
@@ -119,8 +124,35 @@ class Game:
             return True # Retourne True pour indiquer une défaite
         
         return False # Si l'ennemi est mort (déjà géré dans le break), retourne False
+    def show_inventory(self):
+        inventory = self.player.inventory
+        
+        if len(inventory) == 0:
+            print("\n Votre sac est vide...\n")
+            return False
+        
+        print("\n--- Votre inventaire ---\n")
+        for i, item in enumerate(inventory):
+            print(f"{i + 1}. {item.name} ({item.description})")
+        print(f"{len(inventory) + 1}. Retour au menu")
+        
+        choice = input("Quel objet voulez-vous selectionner ?")
+        if choice.isdigit():
+            index = int(choice)
+            if index == len(inventory)+ 1:
+                return False
+            index -= 1
+            if index >=0 and index < len(self.player.inventory):
+                selected_object = inventory[index]
+                self.player.use_item(selected_object)
+                return True
+            else:
+                print("Ce numéro n'est pas dans le sac.")
+        
+        else:
+            print("Choix invalide, veuillez choisir un chiffre.")
+        return False   
     
-    #Menu, add shop + charger save
     def menu(self):
         self.select_character()
         
@@ -141,16 +173,14 @@ class Game:
             
             choice = input("Votre choix : ")
             
-            #start combat, print hero/random_enemy stuff, stats
             if choice == "1":
-                # Appel de la méthode corrigée. is_dead sera True ou False.
                 is_dead = self.battle()
                 if is_dead:
                     print("\n💀 Votre personnage est mort au combat. Retour au menu de sélection des personnages.\n")
-                    self.select_character() # Retourne au menu de sélection des personnages
+                    self.select_character()
                     
             elif choice == "2":
-                print(f"Inventaire: {self.inventory.items}")
+                self.show_inventory()
             
             elif choice == "3":
                 display_entity_stats(self.player)
