@@ -22,7 +22,7 @@ weapons = {
 ,"poignard" : Weapon("Poignard", 10, "Une lame courte et rapide")
 ,"gourdin" : Weapon("Gourdin", 20, "Une massue lourde et brutale")
 ,"axe" : Weapon("Hache", 25, "Une hache de guerre imposante")
- 
+,"yes" : Weapon("tqt", 20, "jspa") 
 }
 
 class Armor(Item):

@@ -1,5 +1,5 @@
 # RPG-python-
- December 2025
+     December 2025
 ---
 Creating a first video game using python. I'm both new to these, and I'm using this projet as a fun way to learn programming
 . RPG based on random/luck, with a little bit of strategy.
