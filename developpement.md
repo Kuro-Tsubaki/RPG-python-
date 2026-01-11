@@ -9,6 +9,7 @@
 | Version | Date       | Changes |
 |---------|------------|---------|
 | **0.1** | 09/01/2026 | ✅ **Initial systems**: `fight_manager`, `useable_item`, `random_enemy` (weighted), `save_system` |
+| **0.1.2** | 11/01/2026 |🪰 **Added**: Dictionnary with buff that clear when fight's over, not optimised, and corrected a bug with potions when drank.
 | **0.2** | ⏳ WIP     | 🔄 **To implement**: Shop, Skills/Buffs/Debuffs, Turn-based, Team, Dungeons |
 
 

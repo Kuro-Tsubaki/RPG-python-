@@ -44,7 +44,7 @@ armors = {
 
 class UseableItem(Item):
     def __init__(self, name, effect, stat_to_fix ,description=""):
-        super().__init__(name, description,stat_to_fix)
+        super().__init__(name,stat_to_fix, description)
         self.effect = effect
         
         

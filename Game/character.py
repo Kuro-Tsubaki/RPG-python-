@@ -48,27 +48,30 @@ class Entity:
         print(f"🆙 Prochain niveau à : {self.max_xp} XP\n")
         
     def use_item(self, item):
-        
         item_stat = getattr(self,item.stat_to_fix)
         up_stat = item_stat + item.effect
         if item.stat_to_fix == "health":
             up_stat = min(up_stat, self.max_health)
         setattr(self, item.stat_to_fix, up_stat)
         
-        print(f"-> {self.name} utilise {item.name} (+{item.effect} {item.stat_to_fix})")
+        stats_permanentes = ["health", "mana", "luck"]
+        if item.stat_to_fix not in stats_permanentes:
+            self.active_buffs[item.stat_to_fix] =  self.active_buffs.get(item.stat_to_fix,0) + item.effect 
+        print(f"-> {self.name} utilise {item.name} (+{item.effect} {item.stat_to_fix})\n")
         self.inventory.remove(item)
         item_stat_after_use = getattr(self, item.stat_to_fix)
         print(f"{self.name} utilise {item.name} !")
-        print(f"{item.stat_to_fix} : {item_stat} -> {item_stat_after_use}")
+        print(f"{item.stat_to_fix} : {item_stat} -> {item_stat_after_use}\n")
             
                 
 class Character(Entity):
     def __init__(self, name, health, strength, main_hand:Weapon=None, off_hand:Weapon=None,
                  helmet:Armor=None, chestplate:Armor=None, leggings:Armor=None, boots:Armor=None, inventory=[],level=1, base_xp=0):
         super().__init__(name, health, strength, main_hand, off_hand,
-                        helmet, chestplate, leggings, boots, inventory,level=level, base_xp=base_xp, )
+                        helmet, chestplate, leggings, boots, inventory,level=level, base_xp=base_xp)
         
-
+        self.active_buffs = {}
+        
 characters = {
 "warrior" : Character("Guerrier", 100, 7,
                    main_hand=weapons["basic_sword"], off_hand=weapons["basic_shield"],

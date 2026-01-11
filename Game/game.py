@@ -43,7 +43,7 @@ class Game:
     def battle(self):
         print("Fonctionnalité combat:")
         display_entity_stats(self.player)
-        print(f"Vous avez {self.player.health}/{self.player.max_health} HP.")
+        print(f"Vous avez {self.player.health}/{self.player.max_health} HP.") #changer display_entity_stats en mettant les hp à la place de ça
         enemy = generate_random_enemy(self.player.level)
         print(f"Un {enemy.name} de {enemy.max_health} HP vous fait face.")
         display_entity_stats(enemy)
@@ -73,7 +73,7 @@ class Game:
                     # Ajout compteur bestiary
                     self.player.bestiary[enemy.name] += 1
                     
-                    #C. Gain d'xp
+                    #C. Def XP
                     base_xp = enemy.base_xp
                     
                     if enemy.level > self.player.level: # ELITE
@@ -88,35 +88,42 @@ class Game:
                         rank_multiplier = 1.0
                         random_bonus = random.randint(1, 5)
                         
-                    # 3. Calcul final et attribution
+                    # 3. Calcul XP
                     total_xp = int((base_xp * rank_multiplier) + random_bonus)
                     self.player.gain_xp(total_xp)
                     
-                    #D. Affichage succès
+                    #D. Trophy
                     print(f"Progression : {self.player.bestiary[enemy.name]} {enemy.name}s vaincus.")
-                    self.player.health = self.player.max_health #vie à 100%
-                    return False
+                    self.player.health = self.player.max_health 
+                    break
                 else:
                     print(f"{enemy.name} Riposte !")
                     fight(enemy,self.player)
             
-                    #Choix de fuite
+                    
                     #2. PV Enemy > 0 : return boucle While
             elif combat_choice == "2":
-                if random.random() < 0.5: #50% fuite de base
+                if random.random() < 0.5: #50% escape
                     print("vous avez fuit")
-                    self.player.health = self.player.max_health / 2#vie à 100%
-                    return False
-                #Si fuite raté l'enemie attaque
+                    self.player.health = self.player.max_health / 2
+                    break
+                
                 else:
                     print("l'ennemi vous bloque la route \n")
                     fight(enemy, self.player)                
             elif combat_choice == "3":
-                self.show_inventory()
-                if not self.player.use_item:
+                objet_utilise = self.show_inventory()
+                if objet_utilise == False:
                     continue 
             else:
                 print("choix invalide")    
+                
+        for stat, total_bonus in self.player.active_buffs.items():
+            new_stat = getattr(self.player, stat)
+            base_stat = new_stat - total_bonus
+            setattr(self.player, stat, base_stat)
+            print(f"L'effet de {stat} se dissipe ({new_stat} -> {base_stat})")
+        self.player.active_buffs.clear()
         
         if self.player.health <= 0:
             print(f"\n💀 Votre {self.player.name} a été vaincu. GAME OVER.")
@@ -136,7 +143,7 @@ class Game:
             print(f"{i + 1}. {item.name} ({item.description})")
         print(f"{len(inventory) + 1}. Retour au menu")
         
-        choice = input("Quel objet voulez-vous selectionner ?")
+        choice = input("\nQuel objet voulez-vous selectionner ?\n")
         if choice.isdigit():
             index = int(choice)
             if index == len(inventory)+ 1:
@@ -152,7 +159,9 @@ class Game:
         else:
             print("Choix invalide, veuillez choisir un chiffre.")
         return False   
-    
+
+
+            
     def menu(self):
         self.select_character()
         
