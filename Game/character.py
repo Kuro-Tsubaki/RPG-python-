@@ -1,5 +1,5 @@
 from Game.items import (weapons, armors, potions, Weapon, Armor, UseableItem)
-
+import random
 class Entity:
     def __init__(self, name, health, strength, main_hand:Weapon=None, off_hand:Weapon=None,
                  helmet:Armor=None, chestplate:Armor=None, leggings:Armor=None, boots:Armor=None, inventory:list[UseableItem]=[], level=1,xp=0, max_xp=100, base_xp=0):
@@ -72,6 +72,27 @@ class Character(Entity):
         
         self.active_buffs = {}
         
+    def calculate_experience_gain(self, enemy):
+        
+        base_xp = enemy.base_xp
+        
+        if enemy.level > self.level:
+            rank_multiplier = 2.0
+            random_bonus = int(self.max_xp * 0.10) 
+
+        elif enemy.level < int(self.level * 0.7): 
+            rank_multiplier = 0.6
+            random_bonus = 0
+
+        else:
+            rank_multiplier = 1.0
+            random_bonus = random.randint(1, 5)
+        
+        total_xp = int((base_xp * rank_multiplier) + random_bonus)
+        self.gain_xp(total_xp)
+        return total_xp
+            
+            
 characters = {
 "warrior" : Character("Guerrier", 100, 7,
                    main_hand=weapons["basic_sword"], off_hand=weapons["basic_shield"],

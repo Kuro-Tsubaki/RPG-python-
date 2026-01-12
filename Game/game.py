@@ -1,5 +1,5 @@
 from Game.character import characters, Entity 
-from Game.fight_manager import fight
+from Game.fight_manager import fight, handle_victory
 from Game.inventory import Inventory
 from Game.utils import display_entity_stats
 from Game.save_load import save_game, load_game, get_save_file, restore_player_data
@@ -43,9 +43,9 @@ class Game:
     def battle(self):
         print("Fonctionnalité combat:")
         display_entity_stats(self.player)
-        print(f"Vous avez {self.player.health}/{self.player.max_health} HP.") #changer display_entity_stats en mettant les hp à la place de ça
+        #print(f"Vous avez {self.player.health}/{self.player.max_health} HP.") #changer display_entity_stats en mettant les hp à la place de ça
         enemy = generate_random_enemy(self.player.level)
-        print(f"Un {enemy.name} de {enemy.max_health} HP vous fait face.")
+        #print(f"Un {enemy.name} de {enemy.max_health} HP vous fait face.")
         display_entity_stats(enemy)
         
         
@@ -60,41 +60,7 @@ class Game:
                 fight(self.player, enemy)
                 #2. Check PV, Si enemy.health <= 0 : break
                 if enemy.health <= 0:
-                    
-                    #A. Victoire
-                    print(f"vous avez vaincu ",enemy.name, "!")
-                    # Gestion de l'expérience, du loot, etc. (à ajouter)
-                    
-                    #B. Système de trophée (Bestiary)
-                    # Vérification
-                    if enemy.name not in self.player.bestiary:
-                        self.player.bestiary[enemy.name] = 0    
-
-                    # Ajout compteur bestiary
-                    self.player.bestiary[enemy.name] += 1
-                    
-                    #C. Def XP
-                    base_xp = enemy.base_xp
-                    
-                    if enemy.level > self.player.level: # ELITE
-                        rank_multiplier = 2.0
-                        random_bonus = int(self.player.max_xp * 0.10) # 10% de l'XP max du joueur
-
-                    elif enemy.level < int(self.player.level * 0.7): # TRASH
-                        rank_multiplier = 0.6
-                        random_bonus = 0
-
-                    else: # STANDARD
-                        rank_multiplier = 1.0
-                        random_bonus = random.randint(1, 5)
-                        
-                    # 3. Calcul XP
-                    total_xp = int((base_xp * rank_multiplier) + random_bonus)
-                    self.player.gain_xp(total_xp)
-                    
-                    #D. Trophy
-                    print(f"Progression : {self.player.bestiary[enemy.name]} {enemy.name}s vaincus.")
-                    self.player.health = self.player.max_health 
+                    handle_victory(self.player,enemy)
                     break
                 else:
                     print(f"{enemy.name} Riposte !")
@@ -122,7 +88,8 @@ class Game:
             new_stat = getattr(self.player, stat)
             base_stat = new_stat - total_bonus
             setattr(self.player, stat, base_stat)
-            print(f"L'effet de {stat} se dissipe ({new_stat} -> {base_stat})")
+            if self.player.health > 0:
+                print(f"L'effet de {stat} se dissipe ({new_stat} -> {base_stat})")
         self.player.active_buffs.clear()
         
         if self.player.health <= 0:

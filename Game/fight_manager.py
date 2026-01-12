@@ -115,3 +115,11 @@ def fight(striker:Entity, defender:Entity):
     #======================#
     print("\n-------------------------\n",defender.name, ":", defender.health, "/", defender.max_health,"HP","\n-------------------------")
     #======================#
+    
+def handle_victory(player,enemy):
+        
+        print(f"vous avez vaincu ",enemy.name, "!")   
+        xp_gagne = player.calculate_experience_gain(enemy)
+        player.bestiary[enemy.name] = player.bestiary.get(enemy.name, 0) + 1
+        print(f"Progression : {player.bestiary[enemy.name]} {enemy.name}s vaincus.")
+        player.health = player.max_health 
