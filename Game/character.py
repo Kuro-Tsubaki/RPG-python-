@@ -23,7 +23,7 @@ class Entity:
         self.base_xp = base_xp
         self.xp = xp
         self.max_xp = max_xp
-        
+        self.active_buffs = {}
         
     def gain_xp(self, amount):
         self.xp += amount
@@ -48,6 +48,10 @@ class Entity:
         print(f"🆙 Prochain niveau à : {self.max_xp} XP\n")
         
     def use_item(self, item):
+        if not isinstance(item,UseableItem):
+            print(f"L'objet {item.name} n'est pas utilisable !")
+            return False
+        
         item_stat = getattr(self,item.stat_to_fix)
         up_stat = item_stat + item.effect
         if item.stat_to_fix == "health":
@@ -62,7 +66,7 @@ class Entity:
         item_stat_after_use = getattr(self, item.stat_to_fix)
         print(f"{self.name} utilise {item.name} !")
         print(f"{item.stat_to_fix} : {item_stat} -> {item_stat_after_use}\n")
-            
+        return True
                 
 class Character(Entity):
     def __init__(self, name, health, strength, main_hand:Weapon=None, off_hand:Weapon=None,
@@ -70,10 +74,9 @@ class Character(Entity):
         super().__init__(name, health, strength, main_hand, off_hand,
                         helmet, chestplate, leggings, boots, inventory,level=level, base_xp=base_xp)
         
-        self.active_buffs = {}
+        
         
     def calculate_experience_gain(self, enemy):
-        
         base_xp = enemy.base_xp
         
         if enemy.level > self.level:
@@ -94,7 +97,7 @@ class Character(Entity):
             
             
 characters = {
-"warrior" : Character("Guerrier", 100, 7,
+"warrior" : Character("Guerrier", 100, 107,
                    main_hand=weapons["basic_sword"], off_hand=weapons["basic_shield"],
                    helmet=armors["helmet"], chestplate=armors["chestplate"], leggings=armors["leggings"], boots=armors["boots"],
                    inventory=[potions["health_potion"], potions["strength_potion"]])
@@ -119,17 +122,30 @@ characters = {
 
 class Enemy(Entity):
     def __init__(self, name, health, strength, main_hand:Weapon=None, off_hand:Weapon=None,
-                 helmet:Armor=None, chestplate:Armor=None, leggings:Armor=None, boots:Armor=None, level=1, base_xp=0):
+                 helmet:Armor=None, chestplate:Armor=None, leggings:Armor=None, boots:Armor=None, level=1, base_xp=0,loot_table=None):
         super().__init__(name, health, strength, main_hand, off_hand,
-                        helmet, chestplate, leggings, boots, level=level, base_xp=base_xp)
-
-
+                        helmet, chestplate, leggings, boots ,level=level, base_xp=base_xp)
+        
+        self.loot_table = loot_table if loot_table is not None else {}
+        
+        
 enemies = {
-"gobelin" : Enemy("Gobelin", 45, 5, main_hand=weapons["poignard"], level=1, base_xp=5)
-,"orque" : Enemy("Orque", 70, 15, main_hand=weapons["gourdin"], off_hand=weapons["basic_shield"], level=1, base_xp=15)
+"gobelin" : Enemy("Gobelin", 45, 5, main_hand=weapons["poignard"], level=1, base_xp=5,loot_table={
+                      "health_potion": 30,
+                      "tissu_abime": 100  
+                  })
+,"orque" : Enemy("Orque", 70, 15, main_hand=weapons["gourdin"], off_hand=weapons["basic_shield"], level=1, base_xp=15,loot_table={
+                      "health_potion": 50,
+                      "dent_orque": 4  
+                  })
 ,"troll" : Enemy("Troll", 120, 30,
              main_hand=weapons["axe"], off_hand=weapons["basic_shield"],
              helmet=armors["helmet"], chestplate=armors["chestplate"],
-             leggings=armors["leggings"], boots=armors["boots"], level=1, base_xp=45)
+             leggings=armors["leggings"], boots=armors["boots"], level=1, base_xp=45, loot_table={
+                 "defenses": 40,
+                 "ceinture": 20,
+                 "os": 80
+                 
+             })
 }
  

@@ -39,17 +39,13 @@ class Game:
             print("Choix invalide ! Veuillez entrer 1, 2 ou 3.")
 
     
-    #Système de combat (duel)    
+    
     def battle(self):
         print("Fonctionnalité combat:")
         display_entity_stats(self.player)
-        #print(f"Vous avez {self.player.health}/{self.player.max_health} HP.") #changer display_entity_stats en mettant les hp à la place de ça
         enemy = generate_random_enemy(self.player.level)
-        #print(f"Un {enemy.name} de {enemy.max_health} HP vous fait face.")
         display_entity_stats(enemy)
-        
-        
-        #Boucle combat continue if health > 0
+    
         while self.player.health > 0 and enemy.health > 0 :
             print("1- Attaquer")
             print("2- Fuir")
@@ -65,11 +61,9 @@ class Game:
                 else:
                     print(f"{enemy.name} Riposte !")
                     fight(enemy,self.player)
-            
                     
-                    #2. PV Enemy > 0 : return boucle While
             elif combat_choice == "2":
-                if random.random() < 0.5: #50% escape
+                if random.random() < 0.5: 
                     print("vous avez fuit")
                     self.player.health = self.player.max_health / 2
                     break
@@ -95,37 +89,41 @@ class Game:
         if self.player.health <= 0:
             print(f"\n💀 Votre {self.player.name} a été vaincu. GAME OVER.")
             
-            return True # Retourne True pour indiquer une défaite
+            return True # True = defeat
         
-        return False # Si l'ennemi est mort (déjà géré dans le break), retourne False
+        return False # security if enemy dead : return False
+    
     def show_inventory(self):
         inventory = self.player.inventory
-        
-        if len(inventory) == 0:
-            print("\n Votre sac est vide...\n")
-            return False
-        
-        print("\n--- Votre inventaire ---\n")
-        for i, item in enumerate(inventory):
-            print(f"{i + 1}. {item.name} ({item.description})")
-        print(f"{len(inventory) + 1}. Retour au menu")
-        
-        choice = input("\nQuel objet voulez-vous selectionner ?\n")
-        if choice.isdigit():
-            index = int(choice)
-            if index == len(inventory)+ 1:
+        checking = True
+        while checking:
+            if len(inventory) == 0:
+                print("\n Votre sac est vide...\n")
                 return False
-            index -= 1
-            if index >=0 and index < len(self.player.inventory):
-                selected_object = inventory[index]
-                self.player.use_item(selected_object)
-                return True
+
+            print("\n--- Votre inventaire ---\n")
+            for i, item in enumerate(inventory):
+                print(f"{i + 1}. {item.name} | {item.description} | Prix: {item.value}g")
+            print(f"{len(inventory) + 1}. Retour au menu")
+
+            choice = input("\nQuel objet voulez-vous selectionner ?\n")
+            if choice.isdigit():
+                index = int(choice)
+                if index == len(inventory)+ 1:
+                    return False
+                index -= 1
+                if index >=0 and index < len(self.player.inventory):
+                    selected_object = inventory[index]
+                    succeed = self.player.use_item(selected_object)
+                    if succeed:
+                        return True
+                
+                else:
+                    print("Ce numéro n'est pas dans le sac.")
+
             else:
-                print("Ce numéro n'est pas dans le sac.")
-        
-        else:
-            print("Choix invalide, veuillez choisir un chiffre.")
-        return False   
+                print("Choix invalide, veuillez choisir un chiffre.")
+            
 
 
             
@@ -168,7 +166,7 @@ class Game:
                 pass    
             
             elif choice =="6":
-                #Dongeons
+                #Dungeons
                 pass
                 
             elif choice == "7":

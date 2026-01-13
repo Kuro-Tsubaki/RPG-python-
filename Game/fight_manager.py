@@ -1,4 +1,5 @@
 from Game.character import Entity, Character
+from Game.items import all_items
 import random 
 def fight(striker:Entity, defender:Entity):
     
@@ -119,7 +120,14 @@ def fight(striker:Entity, defender:Entity):
 def handle_victory(player,enemy):
         
         print(f"vous avez vaincu ",enemy.name, "!")   
-        xp_gagne = player.calculate_experience_gain(enemy)
+        player.calculate_experience_gain(enemy)
         player.bestiary[enemy.name] = player.bestiary.get(enemy.name, 0) + 1
         print(f"Progression : {player.bestiary[enemy.name]} {enemy.name}s vaincus.")
-        player.health = player.max_health 
+        player.health = player.max_health
+        
+        for nom_item, chance in enemy.loot_table.items():
+            roue = random.randint(1,100)
+            if roue <= chance:
+                objet_reel = all_items[nom_item]
+                player.inventory.append(objet_reel)
+                print(f"{objet_reel.name} a été ajouté à votre inventaire\n")

@@ -1,11 +1,12 @@
 
 
 class Item:
-    def __init__(self, name, stat_to_fix=None, description=""):
+    def __init__(self, name, stat_to_fix=None, value = 0, description=""):
         self.name = name
         self.description = description
         self.stat_to_fix = stat_to_fix
-
+        self.value = value
+        
 class Weapon(Item):
     def __init__(self, name, attack, description=""):
         super().__init__(name, description)
@@ -22,8 +23,21 @@ weapons = {
 ,"poignard" : Weapon("Poignard", 10, "Une lame courte et rapide")
 ,"gourdin" : Weapon("Gourdin", 20, "Une massue lourde et brutale")
 ,"axe" : Weapon("Hache", 25, "Une hache de guerre imposante")
-,"yes" : Weapon("tqt", 20, "jspa") 
+
 }
+
+class Loot(Item):
+    def __init__(self, name, value = 0, description=""):
+        super().__init__(name=name, stat_to_fix=None, value=value, description=description)
+        
+loot = {
+        "tissu_abime": Loot("Tissu abîmé", 2, "Un vieux morceau de tissu sale."),
+        "dent_orque": Loot("Dent d'Orque", 10, "Une dent jaune et solide.")
+        
+        
+    }
+    
+    
 
 class Armor(Item):
     def __init__(self, name, defense, description=""):
@@ -43,17 +57,18 @@ armors = {
 
 
 class UseableItem(Item):
-    def __init__(self, name, effect, stat_to_fix ,description=""):
-        super().__init__(name,stat_to_fix, description)
+    def __init__(self, name, effect, stat_to_fix, description="", value=0):
+        super().__init__(name=name, stat_to_fix=stat_to_fix, value=value, description=description)
         self.effect = effect
-        
+        self.value  = value
         
 # --- Useable Item ---
 potions = {
-"health_potion" : UseableItem("Potion de Santé", 25 , "health", "Restaure 25 points de vie")
-,"strength_potion" : UseableItem("Potion de Force", 5 , "strength","Augmente la force de 5 points pour le combat en cours")
-,"mana_potion" : UseableItem("potion de mana" ,10 , "mana","Redonne du mana")
-,"luck_potion" : UseableItem("Potion d'amélioration de chance", 30,"luck", "Augmente la chance")
+"health_potion" : UseableItem("Potion de Santé", 25 , "health", "Restaure 25 points de vie", 5)
+,"strength_potion" : UseableItem("Potion de Force", 5 , "strength","Augmente la force de 5 points pour le combat en cours", 8)
+,"mana_potion" : UseableItem("potion de mana" ,10 , "mana","Redonne du mana", 3)
+,"luck_potion" : UseableItem("Potion d'amélioration de chance", 30,"luck", "Augmente la chance", 10)
     
 }
 
+all_items = {**weapons, **armors, **potions, **loot}
