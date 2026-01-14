@@ -13,7 +13,7 @@ class Game:
     def __init__(self):
         self.player = None
         self.inventory = Inventory()
-        
+        self.random_item = {}
     #selection de la classe    
     def select_character(self):
         # Dictionnaire des personnages disponibles
@@ -92,11 +92,38 @@ class Game:
             return True # True = defeat
         
         return False # security if enemy dead : return False
-    
+    def select_item(self):
+        inventory = self.player.inventory
+        checking_inventory = True
+        while checking_inventory:
+            if len(inventory) == 0:
+                print("\n Votre sac est vide...\n")
+                return False
+
+            print("\n--- Votre inventaire ---\n")
+            for i, item in enumerate(inventory):
+                print(f"{i + 1}. {item.name} | {item.description} | Prix: {item.value}g")
+            print(f"{len(inventory) + 1}. Retour au menu")
+
+            choice = input("\nQuel objet voulez-vous selectionner ?\n")
+            if choice.isdigit():
+                index = int(choice)
+                if index == len(inventory)+ 1:
+                    return False
+                index -= 1
+                if index >=0 and index < len(self.player.inventory):
+                    selected_object = inventory[index]
+                    return selected_object
+                else:
+                    print("Ce numéro n'est pas dans le sac.")
+
+            else:
+                print("Choix invalide, veuillez choisir un chiffre.")
+                
     def show_inventory(self):
         inventory = self.player.inventory
-        checking = True
-        while checking:
+        checking_inventory = True
+        while checking_inventory:
             if len(inventory) == 0:
                 print("\n Votre sac est vide...\n")
                 return False
@@ -116,7 +143,8 @@ class Game:
                     selected_object = inventory[index]
                     succeed = self.player.use_item(selected_object)
                     if succeed:
-                        return True
+                        return selected_object
+                    
                 
                 else:
                     print("Ce numéro n'est pas dans le sac.")
@@ -125,8 +153,29 @@ class Game:
                 print("Choix invalide, veuillez choisir un chiffre.")
             
 
-
+    def open_shop(self):
+        checking_shop = True
+        
+        while checking_shop:
+            print(f"\nBienvenue au shop ! Vous avez {self.player.gold} golds sur votre compte.\n")
             
+            print("1- Acheter")
+            print("2- Vendre")
+            print("3- Quitter")
+            shop_choice = input("Votre choix : \n")
+            
+            if shop_choice == "1":
+                pass
+            elif shop_choice == "2":
+                shop_selected_object = self.select_item()
+                if shop_selected_object:
+                    self.player.gold += shop_selected_object.value
+                    self.player.inventory.remove(shop_selected_object)
+                    print(f"Vous venez de vendre {shop_selected_object.name} pour {shop_selected_object.value} golds, vous avez maintenant {self.player.gold} golds sur votre compte ! ")
+            elif shop_choice == "3":
+                return False
+            else:
+                print("Choix invalide !")
     def menu(self):
         self.select_character()
         
@@ -136,9 +185,9 @@ class Game:
             print("1- Combattre")
             print("2- Afficher inventaire")
             print("3- Afficher équipement")
-            print("4- Utiliser un consommable")
+            print("4- Job - en construction")
             print("5- Ouvrir le shop")
-            print("6- Dongeons")
+            print("6- Dongeons - en construction")
             print("7- Sauvegarder")
             print("8- Charger sauvegarde")
             print("9- Changer de personnage")
@@ -163,7 +212,7 @@ class Game:
                 pass
             
             elif choice =="5":
-                pass    
+                self.open_shop()
             
             elif choice =="6":
                 #Dungeons

@@ -24,7 +24,8 @@ class Entity:
         self.xp = xp
         self.max_xp = max_xp
         self.active_buffs = {}
-        
+        #---
+       
     def gain_xp(self, amount):
         self.xp += amount
         print(f"✨ XP : +{amount} (Total: {self.xp}/{self.max_xp})")
@@ -70,10 +71,10 @@ class Entity:
                 
 class Character(Entity):
     def __init__(self, name, health, strength, main_hand:Weapon=None, off_hand:Weapon=None,
-                 helmet:Armor=None, chestplate:Armor=None, leggings:Armor=None, boots:Armor=None, inventory=[],level=1, base_xp=0):
+                 helmet:Armor=None, chestplate:Armor=None, leggings:Armor=None, boots:Armor=None, inventory=[],level=1, base_xp=0, gold = 0):
         super().__init__(name, health, strength, main_hand, off_hand,
                         helmet, chestplate, leggings, boots, inventory,level=level, base_xp=base_xp)
-        
+        self.gold = gold
         
         
     def calculate_experience_gain(self, enemy):

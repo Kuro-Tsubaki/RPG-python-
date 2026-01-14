@@ -15,8 +15,9 @@ def save_game(player, inventory):
         "level": player.level,
         "inventory": inventory.items,
         "bestiary": player.bestiary,
+        "gold": player.gold,
     }
-    # Equipement du joueur
+    
     if player.main_hand:
         player_data["main_hand"] = player.main_hand.name
     if player.off_hand:
@@ -30,7 +31,7 @@ def save_game(player, inventory):
     if player.boots:
         player_data["boots"] = player.boots.name
         
-    # Le fichier porte le nom du personnage
+    
     filename = get_save_file(player.name)
     with open(filename, "w", encoding="utf-8") as f:
         json.dump(player_data, f, indent=4, ensure_ascii=False)
@@ -55,8 +56,9 @@ def restore_player_data(player, player_data, inventory, weapons, armors):
     player.level = player_data.get("level", 1)
     inventory.items = player_data.get("inventory", [])
     player.bestiary = player_data.get("bestiary", {})
+    player.gold = player_data.get("gold", player.gold)
     
-    # Restaurer l'équipement
+    # backup equipement
     if "main_hand" in player_data:
         main_hand_name = player_data["main_hand"]
         for weapon in weapons.values():
