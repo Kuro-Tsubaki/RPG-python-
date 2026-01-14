@@ -10,7 +10,7 @@
 |---------|------------|---------|
 | **0.1** | 09/01/2026 | ✅ **Initial systems**: `fight_manager`, `useable_item`, `random_enemy` (weighted), `save_system` |
 | **0.1.2** | 11/01/2026 |🪰 **Added**: Dictionnary with buff that clear when fight's over, not optimized, and corrected a bug with potions when drank.|
-| **0.1.2.5** | 12/01/2026 |📦🏭 **clear code** : game.py was a mess, it's cleared but not clearest, not really an update. UX better but I will improve it later.|
+| **0.1.2.5** | 12/01/2026 |📦🏭 **clear code** : game.py was a trash, it's cleared but not clearest, not really an update. UX better but I will improve it later.|
 | **0.1.3** | 13/01/2026 | 🛒 **Shop created**: optimized a little and unoptimized newest added code... Shop created with selling system but not market. Market on 0.1.4|
 | **0.2** | ⏳ WIP     | 🔄 **To implement**: Shop, Skills/Buffs/Debuffs, Turn-based, Team, Dungeons |
 
