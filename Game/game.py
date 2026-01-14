@@ -4,16 +4,18 @@ from Game.inventory import Inventory
 from Game.utils import display_entity_stats
 from Game.save_load import save_game, load_game, get_save_file, restore_player_data
 from Game.enemy_spawner import generate_random_enemy, get_enemy_actual_level
-from Game.items import weapons, armors
+from Game.items import weapons, armors, shop_items
 import random
 import copy
 
 
 class Game:
-    def __init__(self):
+    def __init__(self,):
         self.player = None
         self.inventory = Inventory()
-        self.random_item = {}
+        self.shop_slots = [None, None, None, None]
+        self.shop_locked = False
+        self.refresh_shop()
     #selection de la classe    
     def select_character(self):
         # Dictionnaire des personnages disponibles
@@ -57,6 +59,7 @@ class Game:
                 #2. Check PV, Si enemy.health <= 0 : break
                 if enemy.health <= 0:
                     handle_victory(self.player,enemy)
+                    self.refresh_shop()
                     break
                 else:
                     print(f"{enemy.name} Riposte !")
@@ -66,6 +69,7 @@ class Game:
                 if random.random() < 0.5: 
                     print("vous avez fuit")
                     self.player.health = self.player.max_health / 2
+                    self.refresh_shop()
                     break
                 
                 else:
@@ -161,11 +165,39 @@ class Game:
             
             print("1- Acheter")
             print("2- Vendre")
-            print("3- Quitter")
+            print("3- Actualiser")
+            print("4- Quitter")
+            
             shop_choice = input("Votre choix : \n")
             
             if shop_choice == "1":
-                pass
+                print("\n--- OBJETS À VENDRE ---")
+                for i, item in enumerate(self.shop_slots):
+                    if item is None:
+                        print(f"{i+1}. [Emplacement Vide]")
+                    else:
+                        prix_achat = int(item.value * 1.4)
+                        print(f"{i+1}. {item.name} | Prix : {prix_achat}g") 
+                        
+                buy_input = input("\n Quel objet voulez-vous acheter ?")
+                if buy_input.isdigit():
+                    index = int(buy_input) - 1
+                    if 0 <= index < len(self.shop_slots):
+                        selected_item = self.shop_slots[index]
+            
+                        if selected_item:
+                
+                            prix_achat = int(selected_item.value * 1.4)
+                
+                
+                            if self.player.gold >= prix_achat:
+                                self.player.gold -= prix_achat
+                                self.player.inventory.append(selected_item)
+                                self.shop_slots[index] = None
+                                print(f"Achat réussi : {selected_item.name} !")
+                            else:
+                                print("Pas assez d'or !")
+                                
             elif shop_choice == "2":
                 shop_selected_object = self.select_item()
                 if shop_selected_object:
@@ -173,9 +205,23 @@ class Game:
                     self.player.inventory.remove(shop_selected_object)
                     print(f"Vous venez de vendre {shop_selected_object.name} pour {shop_selected_object.value} golds, vous avez maintenant {self.player.gold} golds sur votre compte ! ")
             elif shop_choice == "3":
+                return
+            elif shop_choice == "4":
                 return False
             else:
                 print("Choix invalide !")
+    def refresh_shop(self):
+        
+        if self.shop_locked:
+            return
+        
+        item_in_shop = list(shop_items.values()) #possibilities
+        weights = []                             #weights of possibilities
+        for item in item_in_shop:
+            weights.append(item.rarity)
+        self.shop_slots = random.choices(item_in_shop,weights,k=4)
+            
+        
     def menu(self):
         self.select_character()
         
