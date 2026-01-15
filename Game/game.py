@@ -16,6 +16,7 @@ class Game:
         self.shop_slots = [None, None, None, None]
         self.shop_locked = False
         self.refresh_shop()
+        self.reroll_cost = 15
     #selection de la classe    
     def select_character(self):
         # Dictionnaire des personnages disponibles
@@ -60,6 +61,7 @@ class Game:
                 if enemy.health <= 0:
                     handle_victory(self.player,enemy)
                     self.refresh_shop()
+                    self.reroll_cost = 15
                     break
                 else:
                     print(f"{enemy.name} Riposte !")
@@ -70,11 +72,12 @@ class Game:
                     print("vous avez fuit")
                     self.player.health = self.player.max_health / 2
                     self.refresh_shop()
+                    self.reroll_cost = 15
                     break
-                
                 else:
                     print("l'ennemi vous bloque la route \n")
-                    fight(enemy, self.player)                
+                    fight(enemy, self.player)
+                    
             elif combat_choice == "3":
                 objet_utilise = self.show_inventory()
                 if objet_utilise == False:
@@ -92,10 +95,9 @@ class Game:
         
         if self.player.health <= 0:
             print(f"\n💀 Votre {self.player.name} a été vaincu. GAME OVER.")
-            
-            return True # True = defeat
-        
+            return True # True = defeat    
         return False # security if enemy dead : return False
+    
     def select_item(self):
         inventory = self.player.inventory
         checking_inventory = True
@@ -147,81 +149,74 @@ class Game:
                     selected_object = inventory[index]
                     succeed = self.player.use_item(selected_object)
                     if succeed:
-                        return selected_object
-                    
-                
+                        return selected_object   
                 else:
                     print("Ce numéro n'est pas dans le sac.")
-
             else:
                 print("Choix invalide, veuillez choisir un chiffre.")
-            
-
-    def open_shop(self):
-        checking_shop = True
+    def _handle_buy(self):
+        print("\n--- OBJETS À VENDRE ---")
+        for i, item in enumerate(self.shop_slots):
+            if item is None:
+                print(f"{i+1}. [Emplacement Vide]")
+            else:
+                prix_achat = int(item.value * 1.4)
+                print(f"{i+1}. {item.name} | Prix : {prix_achat}g")
         
-        while checking_shop:
-            print(f"\nBienvenue au shop ! Vous avez {self.player.gold} golds sur votre compte.\n")
+        # Ton option de retour dynamique
+        print(f"{len(self.shop_slots) + 1}. Retour")
+
+        buy_input = input("\nQuel objet voulez-vous acheter ? ")
+        
+        if buy_input.isdigit():
+            index = int(buy_input) - 1
             
+            # Cas du bouton "Retour"
+            if index == len(self.shop_slots):
+                return # On quitte la fonction, ce qui nous ramène au menu du shop
+
+            if 0 <= index < len(self.shop_slots):
+                selected_item = self.shop_slots[index]
+                if selected_item:
+                    prix_achat = int(selected_item.value * 1.4)
+                    if self.player.gold >= prix_achat:
+                        self.player.gold -= prix_achat
+                        self.player.inventory.append(selected_item)
+                        self.shop_slots[index] = None
+                        print(f"Achat réussi : {selected_item.name} !")
+                    else:
+                        print("Vous n'avez Pas assez d'or !")
+    def _handle_reroll(self):
+        if self.player.gold >= self.reroll_cost:
+            self.player.gold -= self.reroll_cost # Correction ici : il manquait le '=' dans ton code !
+            self.refresh_shop()
+            self.reroll_cost = int(self.reroll_cost * 1.35)
+            print(f"Boutique actualisée. Prochain coût : {self.reroll_cost}g")
+        else:
+            print(" Vous n'avez pas assez de gold.")
+    def open_shop(self):
+        while True:
+            print(f"\n--- MARCHAND (Or: {self.player.gold}g | Reroll: {self.reroll_cost}g) ---")
             print("1- Acheter")
             print("2- Vendre")
             print("3- Actualiser")
             print("4- Quitter")
             
-            shop_choice = input("Votre choix : \n")
+            shop_choice = input("Votre choix : ")
             
             if shop_choice == "1":
-                print("\n--- OBJETS À VENDRE ---")
-                for i, item in enumerate(self.shop_slots):
-                    if item is None:
-                        print(f"{i+1}. [Emplacement Vide]")
-                    else:
-                        prix_achat = int(item.value * 1.4)
-                        print(f"{i+1}. {item.name} | Prix : {prix_achat}g") 
-                        
-                buy_input = input("\n Quel objet voulez-vous acheter ?")
-                if buy_input.isdigit():
-                    index = int(buy_input) - 1
-                    if 0 <= index < len(self.shop_slots):
-                        selected_item = self.shop_slots[index]
-            
-                        if selected_item:
-                
-                            prix_achat = int(selected_item.value * 1.4)
-                
-                
-                            if self.player.gold >= prix_achat:
-                                self.player.gold -= prix_achat
-                                self.player.inventory.append(selected_item)
-                                self.shop_slots[index] = None
-                                print(f"Achat réussi : {selected_item.name} !")
-                            else:
-                                print("Pas assez d'or !")
-                                
+                self._handle_buy()   # Appelle la sous-fonction
             elif shop_choice == "2":
+                # On peut directement appeler la logique de vente ici ou créer _handle_sell
                 shop_selected_object = self.select_item()
                 if shop_selected_object:
                     self.player.gold += shop_selected_object.value
                     self.player.inventory.remove(shop_selected_object)
-                    print(f"Vous venez de vendre {shop_selected_object.name} pour {shop_selected_object.value} golds, vous avez maintenant {self.player.gold} golds sur votre compte ! ")
+                    print(f"✅ Vendu pour {shop_selected_object.value}g !")
             elif shop_choice == "3":
-                return
+                self._handle_reroll() # Appelle la sous-fonction
             elif shop_choice == "4":
-                return False
-            else:
-                print("Choix invalide !")
-    def refresh_shop(self):
-        
-        if self.shop_locked:
-            return
-        
-        item_in_shop = list(shop_items.values()) #possibilities
-        weights = []                             #weights of possibilities
-        for item in item_in_shop:
-            weights.append(item.rarity)
-        self.shop_slots = random.choices(item_in_shop,weights,k=4)
-            
-        
+                break # Sort de la boucle while du shop                        
     def menu(self):
         self.select_character()
         

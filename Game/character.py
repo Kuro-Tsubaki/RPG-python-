@@ -71,7 +71,7 @@ class Entity:
                 
 class Character(Entity):
     def __init__(self, name, health, strength, main_hand:Weapon=None, off_hand:Weapon=None,
-                 helmet:Armor=None, chestplate:Armor=None, leggings:Armor=None, boots:Armor=None, inventory=[],level=1, base_xp=0, gold = 0):
+                 helmet:Armor=None, chestplate:Armor=None, leggings:Armor=None, boots:Armor=None, inventory=[],level=1, base_xp=0, gold = 100):
         super().__init__(name, health, strength, main_hand, off_hand,
                         helmet, chestplate, leggings, boots, inventory,level=level, base_xp=base_xp)
         self.gold = gold
@@ -98,17 +98,17 @@ class Character(Entity):
             
             
 characters = {
-"warrior" : Character("Guerrier", 100, 107,
+"warrior" : Character("Guerrier", 100, 8,
                    main_hand=weapons["basic_sword"], off_hand=weapons["basic_shield"],
                    helmet=armors["helmet"], chestplate=armors["chestplate"], leggings=armors["leggings"], boots=armors["boots"],
                    inventory=[potions["health_potion"], potions["strength_potion"]])
 
-,"mage" : Character("Mage", 70, 8,
+,"mage" : Character("Mage", 70, 5,
                 main_hand=weapons["magic_staff"], off_hand=weapons["spell_book"],
                 helmet=armors["helmet"], chestplate=armors["chestplate"], leggings=armors["leggings"], boots=armors["boots"],
                 inventory=[potions["mana_potion"], potions["health_potion"]])
 
-,"archer" : Character("Archer", 80, 10,
+,"archer" : Character("Archer", 80, 7,
                   main_hand=weapons["wooden_bow"], off_hand=weapons["wooden_trap"],
                   helmet=armors["helmet"], chestplate=armors["chestplate"], leggings=armors["leggings"], boots=armors["boots"],
                   inventory=[potions["health_potion"]])
@@ -132,8 +132,8 @@ class Enemy(Entity):
         
 enemies = {
 "gobelin" : Enemy("Gobelin", 45, 5, main_hand=weapons["poignard"], level=1, base_xp=5,loot_table={
-                      "health_potion": 30,
-                      "tissu_abime": 100  
+                      "health_potion": 25,
+                      "tissu_abime": 50 
                   })
 ,"orque" : Enemy("Orque", 70, 15, main_hand=weapons["gourdin"], off_hand=weapons["basic_shield"], level=1, base_xp=15,loot_table={
                       "health_potion": 50,
@@ -143,8 +143,8 @@ enemies = {
              main_hand=weapons["axe"], off_hand=weapons["basic_shield"],
              helmet=armors["helmet"], chestplate=armors["chestplate"],
              leggings=armors["leggings"], boots=armors["boots"], level=1, base_xp=45, loot_table={
-                 "defenses": 40,
-                 "ceinture": 20,
+                 "defenses": 30,
+                 "ceinture": 10,
                  "os": 80
                  
              })
