@@ -5,6 +5,7 @@ from Game.utils import display_entity_stats
 from Game.save_load import save_game, load_game, get_save_file, restore_player_data
 from Game.enemy_spawner import generate_random_enemy, get_enemy_actual_level
 from Game.items import weapons, armors, shop_items
+from Game.shop_manager import Shop
 import random
 import copy
 
@@ -13,10 +14,7 @@ class Game:
     def __init__(self,):
         self.player = None
         self.inventory = Inventory()
-        self.shop_slots = [None, None, None, None]
-        self.shop_locked = False
-        self.refresh_shop()
-        self.reroll_cost = 15
+        self.shop = Shop()
     #selection de la classe    
     def select_character(self):
         # Dictionnaire des personnages disponibles
@@ -33,7 +31,6 @@ class Game:
             selected_character = available_characters.get(input_choice)
             
             if selected_character:
-                self.player = copy.deepcopy(selected_character)
                 # Affichage des informations du personnage sélectionné
                 print(f"\nVous avez choisi: {self.player.name}")
                 print(f"Santé: {self.player.health} | Force: {self.player.strength}")
@@ -60,8 +57,8 @@ class Game:
                 #2. Check PV, Si enemy.health <= 0 : break
                 if enemy.health <= 0:
                     handle_victory(self.player,enemy)
-                    self.refresh_shop()
-                    self.reroll_cost = 15
+                    self.shop.refresh_shop(self.player)
+                    self.player.reroll_cost = 15
                     break
                 else:
                     print(f"{enemy.name} Riposte !")
@@ -71,8 +68,8 @@ class Game:
                 if random.random() < 0.5: 
                     print("vous avez fuit")
                     self.player.health = self.player.max_health / 2
-                    self.refresh_shop()
-                    self.reroll_cost = 15
+                    self.shop.refresh_shop(self.player)
+                    self.player.reroll_cost = 15
                     break
                 else:
                     print("l'ennemi vous bloque la route \n")
@@ -98,34 +95,6 @@ class Game:
             return True # True = defeat    
         return False # security if enemy dead : return False
     
-    def select_item(self):
-        inventory = self.player.inventory
-        checking_inventory = True
-        while checking_inventory:
-            if len(inventory) == 0:
-                print("\n Votre sac est vide...\n")
-                return False
-
-            print("\n--- Votre inventaire ---\n")
-            for i, item in enumerate(inventory):
-                print(f"{i + 1}. {item.name} | {item.description} | Prix: {item.value}g")
-            print(f"{len(inventory) + 1}. Retour au menu")
-
-            choice = input("\nQuel objet voulez-vous selectionner ?\n")
-            if choice.isdigit():
-                index = int(choice)
-                if index == len(inventory)+ 1:
-                    return False
-                index -= 1
-                if index >=0 and index < len(self.player.inventory):
-                    selected_object = inventory[index]
-                    return selected_object
-                else:
-                    print("Ce numéro n'est pas dans le sac.")
-
-            else:
-                print("Choix invalide, veuillez choisir un chiffre.")
-                
     def show_inventory(self):
         inventory = self.player.inventory
         checking_inventory = True
@@ -133,90 +102,28 @@ class Game:
             if len(inventory) == 0:
                 print("\n Votre sac est vide...\n")
                 return False
-
             print("\n--- Votre inventaire ---\n")
-            for i, item in enumerate(inventory):
+            sorted_inventory = sorted(inventory, key=lambda x: x.name)
+            for i, item in enumerate(sorted_inventory):
                 print(f"{i + 1}. {item.name} | {item.description} | Prix: {item.value}g")
-            print(f"{len(inventory) + 1}. Retour au menu")
-
-            choice = input("\nQuel objet voulez-vous selectionner ?\n")
+            print(f"{len(sorted_inventory) + 1}. Retour au menu")
+            choice = input("\nQuel objet voulez-vous utiliser ?\n")
             if choice.isdigit():
                 index = int(choice)
-                if index == len(inventory)+ 1:
+                if index == len(sorted_inventory) + 1:
                     return False
                 index -= 1
-                if index >=0 and index < len(self.player.inventory):
-                    selected_object = inventory[index]
+                if 0 <= index < len(sorted_inventory):
+                    selected_object = sorted_inventory[index]
                     succeed = self.player.use_item(selected_object)
                     if succeed:
+                        inventory.remove(selected_object)
                         return selected_object   
                 else:
                     print("Ce numéro n'est pas dans le sac.")
             else:
                 print("Choix invalide, veuillez choisir un chiffre.")
-    def _handle_buy(self):
-        print("\n--- OBJETS À VENDRE ---")
-        for i, item in enumerate(self.shop_slots):
-            if item is None:
-                print(f"{i+1}. [Emplacement Vide]")
-            else:
-                prix_achat = int(item.value * 1.4)
-                print(f"{i+1}. {item.name} | Prix : {prix_achat}g")
-        
-        # Ton option de retour dynamique
-        print(f"{len(self.shop_slots) + 1}. Retour")
-
-        buy_input = input("\nQuel objet voulez-vous acheter ? ")
-        
-        if buy_input.isdigit():
-            index = int(buy_input) - 1
-            
-            # Cas du bouton "Retour"
-            if index == len(self.shop_slots):
-                return # On quitte la fonction, ce qui nous ramène au menu du shop
-
-            if 0 <= index < len(self.shop_slots):
-                selected_item = self.shop_slots[index]
-                if selected_item:
-                    prix_achat = int(selected_item.value * 1.4)
-                    if self.player.gold >= prix_achat:
-                        self.player.gold -= prix_achat
-                        self.player.inventory.append(selected_item)
-                        self.shop_slots[index] = None
-                        print(f"Achat réussi : {selected_item.name} !")
-                    else:
-                        print("Vous n'avez Pas assez d'or !")
-    def _handle_reroll(self):
-        if self.player.gold >= self.reroll_cost:
-            self.player.gold -= self.reroll_cost # Correction ici : il manquait le '=' dans ton code !
-            self.refresh_shop()
-            self.reroll_cost = int(self.reroll_cost * 1.35)
-            print(f"Boutique actualisée. Prochain coût : {self.reroll_cost}g")
-        else:
-            print(" Vous n'avez pas assez de gold.")
-    def open_shop(self):
-        while True:
-            print(f"\n--- MARCHAND (Or: {self.player.gold}g | Reroll: {self.reroll_cost}g) ---")
-            print("1- Acheter")
-            print("2- Vendre")
-            print("3- Actualiser")
-            print("4- Quitter")
-            
-            shop_choice = input("Votre choix : ")
-            
-            if shop_choice == "1":
-                self._handle_buy()   # Appelle la sous-fonction
-            elif shop_choice == "2":
-                # On peut directement appeler la logique de vente ici ou créer _handle_sell
-                shop_selected_object = self.select_item()
-                if shop_selected_object:
-                    self.player.gold += shop_selected_object.value
-                    self.player.inventory.remove(shop_selected_object)
-                    print(f"✅ Vendu pour {shop_selected_object.value}g !")
-            elif shop_choice == "3":
-                self._handle_reroll() # Appelle la sous-fonction
-            elif shop_choice == "4":
-                break # Sort de la boucle while du shop                        
+                            
     def menu(self):
         self.select_character()
         
@@ -253,7 +160,7 @@ class Game:
                 pass
             
             elif choice =="5":
-                self.open_shop()
+                self.shop.open_menu(self.player)
             
             elif choice =="6":
                 #Dungeons

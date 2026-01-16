@@ -75,7 +75,11 @@ class Character(Entity):
         super().__init__(name, health, strength, main_hand, off_hand,
                         helmet, chestplate, leggings, boots, inventory,level=level, base_xp=base_xp)
         self.gold = gold
-        
+        self.equipped_weapon = None
+        #self.equipped_weapon_off_hand = None
+        #self.equipped_weapon_main_hand = None
+        self.equipped_armor = None
+        self.defense = 0
         
     def calculate_experience_gain(self, enemy):
         base_xp = enemy.base_xp
@@ -83,19 +87,29 @@ class Character(Entity):
         if enemy.level > self.level:
             rank_multiplier = 2.0
             random_bonus = int(self.max_xp * 0.10) 
-
         elif enemy.level < int(self.level * 0.7): 
             rank_multiplier = 0.6
             random_bonus = 0
-
         else:
             rank_multiplier = 1.0
             random_bonus = random.randint(1, 5)
-        
+            
         total_xp = int((base_xp * rank_multiplier) + random_bonus)
         self.gain_xp(total_xp)
         return total_xp
+    
+    def equip(self,item):
+        target_slot = ""
+        if isinstance(item,Weapon):
+            choix = input("1. Main principale / 2. Main secondaire : ")
+            target_slot = "main_hand" if choix == "1" else "off_hand"
             
+        elif isinstance(item,Armor):
+            target_slot = item.name
+            if "Casque" in item.name: target_slot = "helmet"
+            item_selected = self.inventory
+            getattr(item,item_selected,"Ce n'est pas une armure")
+            if self.equipped_armor is in 
             
 characters = {
 "warrior" : Character("Guerrier", 100, 8,

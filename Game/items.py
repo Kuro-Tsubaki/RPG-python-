@@ -37,7 +37,7 @@ loot = {
         "tissu_abime": Loot("Tissu abîmé", 2, "Un vieux morceau de tissu sale."),
         "dent_orque": Loot("Dent d'Orque", 10, "Une dent jaune et solide."),
         "defenses": Loot("défenses de Troll", 14, "Mieux vaut ne pas se faire planter avec."),
-        "ceinture": Loot("Ceinture en cuir", 20, "Une ceinture qui pas lavé depuis..."),
+        "ceinture": Loot("Ceinture en cuir", 20, "Une ceinture pas lavé depuis..."),
         "os": Loot("Un Os",13,"Je ne donnerai même pas ça a mon chien"),
     }
     
