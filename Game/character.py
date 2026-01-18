@@ -97,7 +97,7 @@ class Character(Entity):
         total_xp = int((base_xp * rank_multiplier) + random_bonus)
         self.gain_xp(total_xp)
         return total_xp
-    
+   
     def equip(self,item):
         target_slot = ""
         if isinstance(item,Weapon):
@@ -105,11 +105,10 @@ class Character(Entity):
             target_slot = "main_hand" if choix == "1" else "off_hand"
             
         elif isinstance(item,Armor):
-            target_slot = item.name
-            if "Casque" in item.name: target_slot = "helmet"
-            item_selected = self.inventory
-            getattr(item,item_selected,"Ce n'est pas une armure")
-            if self.equipped_armor is in 
+            if "helmet" or "chestplate" or "leggings" or "boots" in item:
+                target_slot = item.name
+            
+            
             
 characters = {
 "warrior" : Character("Guerrier", 100, 8,

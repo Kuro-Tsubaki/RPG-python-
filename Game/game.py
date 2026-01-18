@@ -15,11 +15,12 @@ class Game:
         self.player = None
         self.inventory = Inventory()
         self.shop = Shop()
+        
     #selection de la classe    
     def select_character(self):
         # Dictionnaire des personnages disponibles
         available_characters = {
-            "1": characters[ "warrior"],
+            "1": characters["warrior"],
             "2": characters["mage"],
             "3": characters["archer"],
             "4": characters["easteregg"]
@@ -37,7 +38,6 @@ class Game:
                 display_entity_stats(self.player)
                 break
             print("Choix invalide ! Veuillez entrer 1, 2 ou 3.")
-
     
     
     def battle(self):

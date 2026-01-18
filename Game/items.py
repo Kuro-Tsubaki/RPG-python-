@@ -44,20 +44,19 @@ loot = {
     
 
 class Armor(Item):
-    def __init__(self, name, defense, value = 0,description="",rarity=100):
+    def __init__(self, name, defense, slot,value = 0,description="",rarity=100):
         super().__init__(name=name, description=description, value=value, rarity=rarity)
         self.defense = defense
-        
+        self.slot = slot
         
     
 # --- Armors ---
-armors = {
-"helmet" : Armor("Casque", 5, 2,"Protection pour la tête", 90) #name, def, gold, descr
-,"chestplate" : Armor("Plastron", 15, 5, "Armure de torse robuste")
-,"leggings" : Armor("Jambières", 10, 4, "Protection pour les jambes")
-,"boots" : Armor("Bottes", 7, 3,"Bottes renforcées") 
-    
-    
+armors = {       #name,  def,slots,value, desc="", rarity
+"helmet" : Armor("Casque", 5 ,1, 2,"Protection pour la tête", 90) 
+,"chestplate" : Armor("Plastron", 15,2, 5, "Armure de torse robuste")
+,"leggings" : Armor("Jambières", 10,3, 4, "Protection pour les jambes")
+,"boots" : Armor("Bottes", 7, 4,3,"Bottes renforcées")
+,"helmet" : Armor("Casque en bois", 7, 3,"Pas très confortable", 90)
 }
 
 

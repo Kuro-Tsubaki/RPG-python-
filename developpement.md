@@ -33,7 +33,8 @@
 - **File :** `game.py`
 - **File :** `save.py`
   - [ ] 💾 **Save system** — Performance optimization & structure refactor
-
+---
+- **Weapons :** `Main and off hand` player could equip 2 main weapon, instead of one per emplacement + Shield for exemple should add defense, not atk
 ---
 
 ### 🧠 Notes & Ideas
