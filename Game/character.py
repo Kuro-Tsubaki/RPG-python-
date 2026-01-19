@@ -98,18 +98,27 @@ class Character(Entity):
         self.gain_xp(total_xp)
         return total_xp
    
-    def equip(self,item):
+    def equip(self, item):
         target_slot = ""
-        if isinstance(item,Weapon):
+        
+        # Étape 1 : Identification du tiroir (Slot)
+        if isinstance(item, Weapon):
             choix = input("1. Main principale / 2. Main secondaire : ")
             target_slot = "main_hand" if choix == "1" else "off_hand"
+        elif isinstance(item, Armor):
+            target_slot = item.slot # On récupère l'étiquette fixe de l'armure
+    
+        # Étape 2 : L'échange
+        if target_slot:
+            old_item = getattr(self, target_slot)
             
-        elif isinstance(item,Armor):
-            if "helmet" or "chestplate" or "leggings" or "boots" in item:
-                target_slot = item.name
-            
-            
-            
+            if old_item:
+                self.inventory.append(old_item)
+                print(f"🔄 {old_item.name} retourne dans le sac.")
+    
+            setattr(self, target_slot, item)
+            self.inventory.remove(item)
+            print(f"✅ {item.name} équipé en {target_slot} !")
 characters = {
 "warrior" : Character("Guerrier", 100, 8,
                    main_hand=weapons["basic_sword"], off_hand=weapons["basic_shield"],
