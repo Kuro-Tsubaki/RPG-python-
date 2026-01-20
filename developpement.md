@@ -12,7 +12,8 @@
 | **0.1.2** | 11/01/2026 |🪰 **Added**: Dictionnary with buff that clear when fight's over, not optimized, and corrected a bug with potions when drank.|
 | **0.1.2.5** | 12/01/2026 |📦🏭 **clear code** : game.py was a trash, it's cleared but not clearest, not really an update. UX better but I will improve it later.|
 | **0.1.3** | 13/01/2026 | 🛒 **Shop created**: optimized a little and unoptimized newest added code... Shop created with selling system but not market. Market on 0.1.4|
-| **0.1.4** | 14/01/2025 🛒 **Shop almost finished**: miss the refresh shop and on other low fonctionality|
+| **0.1.4** | 14/01/2025 |🛒 **Shop almost finished**: miss the refresh shop and on other low fonctionality|
+| **0.1.5** | 20/01/2025 |🛞 **Rpg minimal Loop**: Now the game is playable, working on mage class|
 | **0.2** | ⏳ WIP     | 🔄 **To implement**: Shop, Skills/Buffs/Debuffs, Turn-based, Team, Dungeons |
 
 
@@ -34,7 +35,9 @@
 - **File :** `save.py`
   - [ ] 💾 **Save system** — Performance optimization & structure refactor
 ---
-- **Weapons :** `Main and off hand` player could equip 2 main weapon, instead of one per emplacement + Shield for exemple should add defense, not atk
+- [x] **Weapons :** `Main and off hand` At that stage, players could equip two main-hand weapons instead of being limited to one per slot. Shields, for example, provided defensive bonuses rather than increasing attack power. 
+  >Players can now choose between dual-wielding two damage-dealing weapons or mixing their equipment — for example, using a main-hand weapon and an off-hand shield to increase defense.
+  This feature offers more personalized gameplay, allowing players to specialize either as high-damage DPS or as a tank. It will also play a key role once dungeon and team-based combat systems are implemented.
 ---
 
 ### 🧠 Notes & Ideas
@@ -43,9 +46,9 @@
 
 > **Fighting journaling** History event
 
-> **Job and tree talent** Job >> unique items
+> **Job + tree talent(Job)** Job >> unique items
  
-> **tree talent :**  Tree talent.
+> **tree talent (Entity) :**  Tree talent.
 
 
 ## 🛠️ Tech Stack
