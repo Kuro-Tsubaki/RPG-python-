@@ -8,6 +8,8 @@ class Item:
         self.value = value
         self.rarity = rarity
         self.slot = slot
+
+
 class Weapon(Item):
     def __init__(self, name, attack, value = 0,description="",rarity=100, slot = ""):
         super().__init__(name=name, description=description,value=value,rarity=rarity,slot=slot)
@@ -16,17 +18,40 @@ class Weapon(Item):
         
 # --- Weapons ---
 weapons = {
-"basic_sword" : Weapon("Épée Basique", 10,4, "Une épée simple mais efficace", 90, "main_hand") #name, atk, gold, descr
-,"basic_shield" : Weapon("Bouclier Basique", 5, 4, "Un bouclier en bois renforcé",90, "off_hand")
-,"magic_staff" : Weapon("Bâton Magique", 15, 4, "Un bâton imprégné de magie",90, "main_hand")
-,"spell_book" : Weapon("Grimoire", 10, 4,"Un livre de sorts anciens",90, "off_hand")
+"basic_sword" : Weapon("Épée Basique", 10,4, "Une épée simple mais efficace", 90, "main_hand") #name, atk, gold, descr, rarity, slot
 ,"wooden_bow" : Weapon("Arc en Bois", 12, 4,"Un arc léger et précis",90, "main_hand")
 ,"wooden_trap" : Weapon("Piège en Bois", 8, 4,"Un piège artisanal",90, "off_hand")
 ,"poignard" : Weapon("Poignard", 10, 5,"Une lame courte et rapide",90, "off_hand")
-,"gourdin" : Weapon("Gourdin", 20, 8,"Une massue lourde et brutale",90, "main_hand")
-,"axe" : Weapon("Hache", 25, 10,"Une hache de guerre imposante",90, "main_hand")
+,"gourdin" : Weapon("Gourdin", 20, 8,"Une massue lourde et brutale",80, "main_hand")
+,"axe" : Weapon("Hache", 25, 10,"Une hache de guerre imposante",80, "main_hand")
 
 }
+
+class Shield(Item):
+    def __init__(self, name, defense, **kwargs):
+        super().__init__(name=name, **kwargs)
+        self.defense = defense
+        
+#name,defense,value,desc,rarity,slot
+shields = {
+"basic_shield" : Shield("Bouclier Basique", 5, value=4, description="Un bouclier en bois", rarity=90, slot="off_hand")
+}
+
+
+class Catalyst(Item):
+    def __init__(self, name, power,mana_bonus, cdr, **kwargs):
+        super().__init__(name=name, **kwargs)
+        self.mana_bonus = mana_bonus
+        self.cdr = cdr # Cooldown Reduction
+        self.power = power
+        
+        
+#name,power,mana_bonus,cdr,descr,rarity,slot
+catalysts = {
+"magic_staff" : Catalyst("Bâton Magique", power=13, mana_bonus=15, cdr=4, description="Un bâton imprégné de magie",rarity=90, slot="main_hand")
+,"spell_book" : Catalyst("Grimoire", power=10, mana_bonus=4,cdr=2,description="Un livre de sorts anciens",rarity=90, slot="off_hand")    
+}
+
 
 class Loot(Item):
     def __init__(self, name, value = 0, description="",rarity=100):
@@ -62,8 +87,6 @@ armors = {       #name,  def,value, desc="",                rarity,slots
 
 
 
-
-
 class UseableItem(Item):
     def __init__(self, name, effect, stat_to_fix, description="", value=0,rarity=100):
         super().__init__(name=name, stat_to_fix=stat_to_fix, value=value, description=description,rarity=rarity)
@@ -80,8 +103,8 @@ potions = {
     
 }
 
-all_items = {**weapons, **armors, **potions, **loot} 
-shop_items = {**weapons, **armors, **potions} #use for the shop
+all_items = {**weapons, **armors, **potions, **loot, **shields, **catalysts}
+shop_items = {**weapons, **armors, **potions, **shields, **catalysts} #use for the shop
 """
     1 - 100 rarity level
     

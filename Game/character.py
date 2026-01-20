@@ -1,13 +1,15 @@
-from Game.items import (weapons, armors, potions, Weapon, Armor, UseableItem)
+from Game.items import (weapons, shields, catalysts,armors, potions, Weapon, Armor, UseableItem,Shield,Catalyst,)
 import random
 class Entity:
-    def __init__(self, name, health, strength, main_hand:Weapon=None, off_hand:Weapon=None,
+    def __init__(self, name, health, strength,mana=100, main_hand:Weapon=None, off_hand:Weapon=None,
                  helmet:Armor=None, chestplate:Armor=None, leggings:Armor=None, boots:Armor=None, inventory:list[UseableItem]=[], level=1,xp=0, max_xp=100, base_xp=0):
         self.name = name
         #Stat
         self.health = health
         self.max_health = health
         self.strength = strength
+        self.mana = mana
+        self.max_mana = mana
         #Stuff
         self.main_hand = main_hand
         self.off_hand = off_hand
@@ -70,16 +72,18 @@ class Entity:
         return True
                 
 class Character(Entity):
-    def __init__(self, name, health, strength, main_hand:Weapon=None, off_hand:Weapon=None,
+    def __init__(self, name, health, strength,mana=100,main_hand:Weapon=None, off_hand:Weapon=None,
                  helmet:Armor=None, chestplate:Armor=None, leggings:Armor=None, boots:Armor=None, inventory=[],level=1, base_xp=0, gold = 100):
-        super().__init__(name, health, strength, main_hand, off_hand,
+        super().__init__(name, health, strength,mana, main_hand, off_hand,
                         helmet, chestplate, leggings, boots, inventory,level=level, base_xp=base_xp)
+        #others
         self.gold = gold
+        #stuff
         self.equipped_weapon = None
-        #self.equipped_weapon_off_hand = None
-        #self.equipped_weapon_main_hand = None
         self.equipped_armor = None
+        #stats
         self.defense = 0
+        
         
     def calculate_experience_gain(self, enemy):
         base_xp = enemy.base_xp
@@ -102,12 +106,12 @@ class Character(Entity):
         target_slot = ""
         
         # Étape 1 : Identification du tiroir (Slot)
-        if isinstance(item, Weapon):
-            choix = input("1. Main principale / 2. Main secondaire : ")
+        if isinstance(item, (Weapon,Shield,Catalyst)):
+            choix = input(f"Equiper {item.name} en : 1. Main principale / 2. Main secondaire ? ")
             target_slot = "main_hand" if choix == "1" else "off_hand"
-        elif isinstance(item, Armor):
+        elif hasattr(item, 'slot') and item.slot != "":
             target_slot = item.slot # On récupère l'étiquette fixe de l'armure
-    
+            
         # Étape 2 : L'échange
         if target_slot:
             old_item = getattr(self, target_slot)
@@ -117,16 +121,19 @@ class Character(Entity):
                 print(f"🔄 {old_item.name} retourne dans le sac.")
     
             setattr(self, target_slot, item)
-            self.inventory.remove(item)
+            if item in self.inventory:
+                self.inventory.remove(item)
             print(f"✅ {item.name} équipé en {target_slot} !")
+        else:
+            print(f"{item.name} n'a pas d'emplacement attitré")
 characters = {
 "warrior" : Character("Guerrier", 100, 8,
-                   main_hand=weapons["basic_sword"], off_hand=weapons["basic_shield"],
+                   main_hand=weapons["basic_sword"], off_hand=shields["basic_shield"],
                    helmet=armors["helmet"], chestplate=armors["chestplate"], leggings=armors["leggings"], boots=armors["boots"],
                    inventory=[potions["health_potion"], potions["strength_potion"]])
 
 ,"mage" : Character("Mage", 70, 5,
-                main_hand=weapons["magic_staff"], off_hand=weapons["spell_book"],
+                main_hand=catalysts["magic_staff"], off_hand=catalysts["spell_book"],
                 helmet=armors["helmet"], chestplate=armors["chestplate"], leggings=armors["leggings"], boots=armors["boots"],
                 inventory=[potions["mana_potion"], potions["health_potion"]])
 
@@ -136,7 +143,7 @@ characters = {
                   inventory=[potions["health_potion"]])
 
 ,"easteregg" : Character("Secret", 999, 999,
-                     main_hand=weapons["basic_sword"], off_hand=weapons["basic_shield"],
+                     main_hand=weapons["basic_sword"], off_hand=shields["basic_shield"],
                      helmet=armors["helmet"], chestplate=armors["chestplate"], leggings=armors["leggings"], boots=armors["boots"])
     
     
@@ -157,12 +164,12 @@ enemies = {
                       "health_potion": 25,
                       "tissu_abime": 50 
                   })
-,"orque" : Enemy("Orque", 70, 15, main_hand=weapons["gourdin"], off_hand=weapons["basic_shield"], level=1, base_xp=15,loot_table={
+,"orque" : Enemy("Orque", 70, 15, main_hand=weapons["gourdin"], off_hand=shields["basic_shield"], level=1, base_xp=15,loot_table={
                       "health_potion": 50,
                       "dent_orque": 4  
                   })
 ,"troll" : Enemy("Troll", 120, 30,
-             main_hand=weapons["axe"], off_hand=weapons["basic_shield"],
+             main_hand=weapons["axe"], off_hand=shields["basic_shield"],
              helmet=armors["helmet"], chestplate=armors["chestplate"],
              leggings=armors["leggings"], boots=armors["boots"], level=1, base_xp=45, loot_table={
                  "defenses": 30,

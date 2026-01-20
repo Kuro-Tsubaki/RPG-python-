@@ -1,5 +1,5 @@
 from Game.character import Entity, Character
-from Game.items import all_items
+from Game.items import all_items, Weapon, Shield, Catalyst
 import random 
 def fight(striker:Entity, defender:Entity):
     
@@ -12,10 +12,10 @@ def fight(striker:Entity, defender:Entity):
     attack_display =  striker.name + " inflige  *totdamage*  damage \n"  + " "+str(striker.strength) + " force brut \n"
     #Replace *totdomage* p/ tout ce que possède le striker qui a de la force
     
-    if striker.main_hand:
+    if striker.main_hand and isinstance(striker.main_hand, Weapon):
         brut_damage += striker.main_hand.attack
         attack_display += " " + str(striker.main_hand.attack) + " force main principale \n"
-    if striker.off_hand:
+    if striker.off_hand and isinstance(striker.off_hand, Weapon):
         brut_damage += striker.off_hand.attack
         attack_display += " " + str(striker.off_hand.attack) + " force main secondaire \n"
     
@@ -63,7 +63,10 @@ def fight(striker:Entity, defender:Entity):
     defender_defense = 0
     defense_display = ""
     #defense_display = defender.name + "\nPossède #totdef# de defense \n" + str(defender_defense) #print du totdef defender
-    
+    # À ajouter dans la section Defense de fight_manager.py
+    if defender.off_hand and isinstance(defender.off_hand, Shield):
+        defender_defense += defender.off_hand.defense
+        defense_display += f" Bouclier: {defender.off_hand.defense} ({defender.off_hand.name})\n"
     if defender.helmet:
         defender_defense += defender.helmet.defense
         defense_display +=  " Defense " + str(defender.helmet.defense) + " " + defender.helmet.name + "\n"

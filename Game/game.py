@@ -1,10 +1,10 @@
-from Game.character import characters, Entity 
+from Game.character import characters, Entity
 from Game.fight_manager import fight, handle_victory
 from Game.inventory import Inventory
 from Game.utils import display_entity_stats
 from Game.save_load import save_game, load_game, get_save_file, restore_player_data
 from Game.enemy_spawner import generate_random_enemy, get_enemy_actual_level
-from Game.items import weapons, armors, shop_items
+from Game.items import weapons, armors, shop_items, Weapon, Armor, UseableItem,Catalyst, Shield
 from Game.shop_manager import Shop
 import random
 import copy
@@ -32,9 +32,8 @@ class Game:
             selected_character = available_characters.get(input_choice)
             
             if selected_character:
-                # Affichage des informations du personnage sélectionné
-                print(f"\nVous avez choisi: {self.player.name}")
-                print(f"Santé: {self.player.health} | Force: {self.player.strength}")
+                self.player = copy.deepcopy(selected_character)
+                print(f"\nVous avez choisi: {self.player.name} \n Santé: {self.player.health} | Force: {self.player.strength}")
                 display_entity_stats(self.player)
                 break
             print("Choix invalide ! Veuillez entrer 1, 2 ou 3.")
@@ -115,10 +114,15 @@ class Game:
                 index -= 1
                 if 0 <= index < len(sorted_inventory):
                     selected_object = sorted_inventory[index]
-                    succeed = self.player.use_item(selected_object)
-                    if succeed:
-                        inventory.remove(selected_object)
-                        return selected_object   
+                    if isinstance(selected_object,UseableItem):
+                        succeed = self.player.use_item(selected_object)
+                        if succeed:
+                            inventory.remove(selected_object)
+                            return selected_object
+                    elif isinstance(selected_object,(Weapon, Armor,Shield,Catalyst)):
+                        succeed = self.player.equip(selected_object)
+                    else:
+                        print("Cet objet n'est pas utilisatable ou équipable")
                 else:
                     print("Ce numéro n'est pas dans le sac.")
             else:
