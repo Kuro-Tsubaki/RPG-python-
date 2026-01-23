@@ -1,12 +1,55 @@
 from Game.character import Entity, Character
 from Game.items import all_items, Weapon, Shield, Catalyst
 import random 
+
+
+def get_dice_result():
+    dice_roll = random.randint(1, 20)
+    print(f"\n🎲 Jet de dé :{dice_roll}\n")
+    if dice_roll == 20:
+        return 2
+    elif dice_roll == 1:
+        return 0.5
+    else:
+        return 1
+
+def calculate_defense(defender):
+    defender_defense = 0
+    defense_display = ""
+    #defense_display = defender.name + "\nPossède #totdef# de defense \n" + str(defender_defense) #print du totdef defender
+    # À ajouter dans la section Defense de fight_manager.py
+    if defender.off_hand and isinstance(defender.off_hand, Shield):
+        defender_defense += defender.off_hand.defense
+        defense_display += f" Bouclier: {defender.off_hand.defense} ({defender.off_hand.name})\n"
+    if defender.helmet:
+        defender_defense += defender.helmet.defense
+        defense_display +=  " Defense " + str(defender.helmet.defense) + " " + defender.helmet.name + "\n"
+    if defender.chestplate:
+        defender_defense += defender.chestplate.defense
+        defense_display += " Defense " + str(defender.chestplate.defense) + " " + defender.chestplate.name + "\n"
+    if defender.leggings:
+        defender_defense += defender.leggings.defense
+        defense_display += " Defense " + str(defender.leggings.defense) + " " + defender.leggings.name + "\n"    
+    if defender.boots:
+        defender_defense += defender.boots.defense
+        defense_display += " Defense " + str(defender.boots.defense) +  " " + defender.boots.name + "\n" 
+    
+    if defender_defense > 0:
+        dizaines = defender_defense //10
+        reduction = (dizaines / 0.7) /100 #changer le 0.7 pour équilibrage (> = plus facile. < = plus dur)
+        reduction = min(reduction, 0.35) #plafond à 35% de reduction
+        # =========================================== #
+        defense_display += "\n Réduction: " + str(round(reduction * 100, 1)) + "%\n" #affichage reduction % selon l'armure   
+    else:
+        reduction = 0
+        defense_display += " Aucune armure équipée\n\n"
+        
+    return reduction, defense_display, defender_defense
+
 def fight(striker:Entity, defender:Entity):
     
-    # ======================== #
-    # === Case - Attaque === #
-    # ======================== #
     
+    # === Case - Attaque === #
     
     brut_damage = striker.strength
     attack_display =  striker.name + " inflige  *totdamage*  damage \n"  + " "+str(striker.strength) + " force brut \n"
@@ -22,24 +65,11 @@ def fight(striker:Entity, defender:Entity):
     # ----------------
     # Dice roll DnD
     # ----------------
-    
-    dice_roll = random.randint(1, 20)
-    print(f"\n🎲 Jet de dé :{dice_roll}\n")
-    
-    if dice_roll == 20:
-        brut_damage *= 2
-        print("🔥 Succès critique ! Attaque x2")
-    if dice_roll == 1:
-        brut_damage /= 2
-        print("💀 Échec critique ! Attaque /2")
-    
+    multiplier = get_dice_result()
     variation = random.uniform(0.85, 1.15)
-    brut_damage *= variation
-    
-    
-    # --------
+    brut_damage *= (variation * multiplier)
+       
     # Mastery
-    # --------
     
     if isinstance(striker, Character) and isinstance(defender, Entity):
         
@@ -59,41 +89,14 @@ def fight(striker:Entity, defender:Entity):
     # ===================== #
     # ===== Defense ===== #
     # ===================== #
+
+        
+        
     
-    defender_defense = 0
-    defense_display = ""
-    #defense_display = defender.name + "\nPossède #totdef# de defense \n" + str(defender_defense) #print du totdef defender
-    # À ajouter dans la section Defense de fight_manager.py
-    if defender.off_hand and isinstance(defender.off_hand, Shield):
-        defender_defense += defender.off_hand.defense
-        defense_display += f" Bouclier: {defender.off_hand.defense} ({defender.off_hand.name})\n"
-    if defender.helmet:
-        defender_defense += defender.helmet.defense
-        defense_display +=  " Defense " + str(defender.helmet.defense) + " " + defender.helmet.name + "\n"
-    if defender.chestplate:
-        defender_defense += defender.chestplate.defense
-        defense_display += " Defense " + str(defender.chestplate.defense) + " " + defender.chestplate.name + "\n"
-    if defender.leggings:
-        defender_defense += defender.leggings.defense
-        defense_display += " Defense " + str(defender.leggings.defense) + " " + defender.leggings.name + "\n"    
-    if defender.boots:
-        defender_defense += defender.boots.defense
-        defense_display += " Defense " + str(defender.boots.defense) +  " " + defender.boots.name + "\n"
-    #Ajout de la défense si en possède + affichage de chaque piece séparément ligne ??
+           
+    
         
-        
-        
-    if defender_defense > 0:
-        dizaines = defender_defense //10
-        reduction = (dizaines / 0.7) /100 #changer le 0.7 pour équilibrage (> = plus facile. < = plus dur)
-        reduction = min(reduction, 0.35) #plafond à 35% de reduction
-        # =========================================== #
-        defense_display += "\n Réduction: " + str(round(reduction * 100, 1)) + "%\n" #affichage reduction % selon l'armure   
-    else:
-        reduction = 0
-        defense_display += " Aucune armure équipée\n\n"
-        
-        
+    reduction, defense_display,defender_defense = calculate_defense(defender)    
     # === CALCUL DES DÉGÂTS FINAUX ===
     final_damage = int(brut_damage * (1 - reduction))
     final_damage = max(final_damage, 1)  # Minimum 1 dégât
@@ -119,7 +122,7 @@ def fight(striker:Entity, defender:Entity):
     #======================#
     print("\n-------------------------\n",defender.name, ":", defender.health, "/", defender.max_health,"HP","\n-------------------------")
     #======================#
-    
+
 def handle_victory(player,enemy):
         
         print(f"vous avez vaincu ",enemy.name, "!")   

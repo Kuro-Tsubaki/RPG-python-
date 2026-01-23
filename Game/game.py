@@ -1,4 +1,4 @@
-from Game.character import characters, Entity
+from Game.character import characters, Entity, Mage
 from Game.fight_manager import fight, handle_victory
 from Game.inventory import Inventory
 from Game.utils import display_entity_stats

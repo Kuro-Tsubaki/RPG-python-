@@ -1,8 +1,8 @@
 from Game.items import (weapons, shields, catalysts,armors, potions, Weapon, Armor, UseableItem,Shield,Catalyst,)
 import random
 class Entity:
-    def __init__(self, name, health, strength,mana=100, main_hand:Weapon=None, off_hand:Weapon=None,
-                 helmet:Armor=None, chestplate:Armor=None, leggings:Armor=None, boots:Armor=None, inventory:list[UseableItem]=[], level=1,xp=0, max_xp=100, base_xp=0):
+    def __init__(self, name, health, strength,magic_power,mana=100, main_hand:Weapon=None, off_hand:Weapon=None,
+                 helmet:Armor=None, chestplate:Armor=None, leggings:Armor=None, boots:Armor=None, inventory:list[UseableItem]=[], level=1,xp=0, max_xp=100, base_xp=0, skills= []):
         self.name = name
         #Stat
         self.health = health
@@ -10,6 +10,7 @@ class Entity:
         self.strength = strength
         self.mana = mana
         self.max_mana = mana
+        self.magic_power = magic_power
         #Stuff
         self.main_hand = main_hand
         self.off_hand = off_hand
@@ -27,7 +28,11 @@ class Entity:
         self.max_xp = max_xp
         self.active_buffs = {}
         #---
-       
+        self.shop_locked = False
+        self.reroll_cost = 15
+        self.shop_slots = [None] * 4
+        #---
+        self.skills = skills
     def gain_xp(self, amount):
         self.xp += amount
         print(f"✨ XP : +{amount} (Total: {self.xp}/{self.max_xp})")
@@ -40,11 +45,9 @@ class Entity:
         self.level += 1
         #Next level 25% harder
         self.max_xp = int(self.max_xp * 1.25)
-        
-        # Up stats
         self.max_health += 15
         self.health = self.max_health
-        self.strength += 2
+        
         
         print(f"\n🌟 PASSAGE AU NIVEAU {self.level} ! 🌟")
         print(f"Stats : ❤️ PV {self.max_health} | 💪 Force {self.strength}")
@@ -59,6 +62,8 @@ class Entity:
         up_stat = item_stat + item.effect
         if item.stat_to_fix == "health":
             up_stat = min(up_stat, self.max_health)
+        elif item.stat_to_fix == "mana":
+            up_stat = min(up_stat, self.max_mana)
         setattr(self, item.stat_to_fix, up_stat)
         
         stats_permanentes = ["health", "mana", "luck"]
@@ -72,10 +77,10 @@ class Entity:
         return True
                 
 class Character(Entity):
-    def __init__(self, name, health, strength,mana=100,main_hand:Weapon=None, off_hand:Weapon=None,
-                 helmet:Armor=None, chestplate:Armor=None, leggings:Armor=None, boots:Armor=None, inventory=[],level=1, base_xp=0, gold = 100):
-        super().__init__(name, health, strength,mana, main_hand, off_hand,
-                        helmet, chestplate, leggings, boots, inventory,level=level, base_xp=base_xp)
+    def __init__(self, name, health, strength,magic_power,mana=100,main_hand:Weapon=None, off_hand:Weapon=None,
+                 helmet:Armor=None, chestplate:Armor=None, leggings:Armor=None, boots:Armor=None, inventory=[],level=1, base_xp=0, gold = 100, skills = []):
+        super().__init__(name, health, strength, magic_power,mana,main_hand, off_hand,
+                        helmet, chestplate, leggings, boots, inventory,level=level, base_xp=base_xp, skills=skills)
         #others
         self.gold = gold
         #stuff
@@ -84,7 +89,9 @@ class Character(Entity):
         #stats
         self.defense = 0
         
-        
+    def level_up(self):
+        super().level_up()
+
     def calculate_experience_gain(self, enemy):
         base_xp = enemy.base_xp
         
@@ -126,49 +133,70 @@ class Character(Entity):
             print(f"✅ {item.name} équipé en {target_slot} !")
         else:
             print(f"{item.name} n'a pas d'emplacement attitré")
+            
+
+class Warrior(Character):
+    def level_up(self):
+        super().level_up()
+        self.strength+=2
+        print(f" Force augmenté : {self.strength}")
+class Mage(Character):
+    def level_up(self):
+        super().level_up()
+        self.magic_power += 2 
+        self.max_mana += 20
+        self.mana = self.max_mana
+        print(f" Mana Max augmenté : {self.max_mana}")
+        
+class Archer(Character):
+    def level_up(self):
+        super().level_up()
+        self.strength +=2
+        print(f" Force augmenté : {self.strength}")
+        
 characters = {
-"warrior" : Character("Guerrier", 100, 8,
+"warrior" : Warrior("Guerrier", health=100, strength=8,magic_power=0,mana=100,
                    main_hand=weapons["basic_sword"], off_hand=shields["basic_shield"],
                    helmet=armors["helmet"], chestplate=armors["chestplate"], leggings=armors["leggings"], boots=armors["boots"],
                    inventory=[potions["health_potion"], potions["strength_potion"]])
 
-,"mage" : Character("Mage", 70, 5,
-                main_hand=catalysts["magic_staff"], off_hand=catalysts["spell_book"],
-                helmet=armors["helmet"], chestplate=armors["chestplate"], leggings=armors["leggings"], boots=armors["boots"],
-                inventory=[potions["mana_potion"], potions["health_potion"]])
+,"mage": Mage("Mage", health=70, strength=4, magic_power=12,mana=100,
+                 main_hand=catalysts["magic_staff"], 
+                 off_hand=catalysts["spell_book"],
+                 helmet=armors["helmet"], 
+                 chestplate=armors["chestplate"], 
+                 leggings=armors["leggings"], 
+                 boots=armors["boots"],
+                 inventory=[potions["mana_potion"], potions["health_potion"]])
 
-,"archer" : Character("Archer", 80, 7,
+,"archer" : Archer("Archer", health=80, strength=9,magic_power=0,mana=100,
                   main_hand=weapons["wooden_bow"], off_hand=weapons["wooden_trap"],
                   helmet=armors["helmet"], chestplate=armors["chestplate"], leggings=armors["leggings"], boots=armors["boots"],
                   inventory=[potions["health_potion"]])
 
-,"easteregg" : Character("Secret", 999, 999,
-                     main_hand=weapons["basic_sword"], off_hand=shields["basic_shield"],
-                     helmet=armors["helmet"], chestplate=armors["chestplate"], leggings=armors["leggings"], boots=armors["boots"])
-    
-    
 }
 
 
+        
 class Enemy(Entity):
-    def __init__(self, name, health, strength, main_hand:Weapon=None, off_hand:Weapon=None,
-                 helmet:Armor=None, chestplate:Armor=None, leggings:Armor=None, boots:Armor=None, level=1, base_xp=0,loot_table=None):
-        super().__init__(name, health, strength, main_hand, off_hand,
-                        helmet, chestplate, leggings, boots ,level=level, base_xp=base_xp)
+    def __init__(self, name, health, strength,magic_power=0,mana=0,main_hand:Weapon=None, off_hand:Weapon=None,
+                 helmet:Armor=None, chestplate:Armor=None, leggings:Armor=None, boots:Armor=None, level=1, base_xp=0,loot_table=None,skills = []):
+        super().__init__(name, health, strength,magic_power,mana, main_hand, off_hand,
+                        helmet, chestplate, leggings, boots ,level=level, base_xp=base_xp, skills=skills)
         
         self.loot_table = loot_table if loot_table is not None else {}
         
         
 enemies = {
-"gobelin" : Enemy("Gobelin", 45, 5, main_hand=weapons["poignard"], level=1, base_xp=5,loot_table={
+"gobelin" : Enemy("Gobelin", health=45, strength=5,magic_power=0,mana=0, main_hand=weapons["poignard"], level=1, base_xp=5,loot_table={
                       "health_potion": 25,
                       "tissu_abime": 50 
                   })
-,"orque" : Enemy("Orque", 70, 15, main_hand=weapons["gourdin"], off_hand=shields["basic_shield"], level=1, base_xp=15,loot_table={
+,"orque" : Enemy("Orque", health=70, strength=15,magic_power=0,mana=0, main_hand=weapons["gourdin"], off_hand=shields["basic_shield"], level=1, base_xp=15,loot_table={
                       "health_potion": 50,
                       "dent_orque": 4  
                   })
-,"troll" : Enemy("Troll", 120, 30,
+,"troll" : Enemy("Troll", health=120, strength=30,magic_power=0,mana=0,
              main_hand=weapons["axe"], off_hand=shields["basic_shield"],
              helmet=armors["helmet"], chestplate=armors["chestplate"],
              leggings=armors["leggings"], boots=armors["boots"], level=1, base_xp=45, loot_table={
@@ -179,3 +207,5 @@ enemies = {
              })
 }
  
+ 
+#later : enemy could use skills
