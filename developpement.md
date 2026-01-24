@@ -14,12 +14,13 @@
 | **0.1.3** | 13/01/2026 | 🛒 **Shop created**: optimized a little and unoptimized newest added code... Shop created with selling system but not market. Market on 0.1.4|
 | **0.1.4** | 14/01/2025 |🛒 **Shop almost finished**: miss the refresh shop and on other low fonctionality|
 | **0.1.5** | 20/01/2025 |🛞 **Rpg minimal Loop**: Now the game is playable, working on mage class|
+| **0.1.5.5**| 24/01/2026 | 🧙 **Mage class**: Mage class almost finished, DamageSkills implemented, SupportSkills for the 0.1.6 update with buffs/debuffs|
 | **0.2** | ⏳ WIP     | 🔄 **To implement**: Shop, Skills/Buffs/Debuffs, Turn-based, Team, Dungeons |
 
 
 ## 🗓️ TO DO (0.2 Sprint)
 
-- [ ] 🏪 **Shop system** — Random item generation (value + rarity) 
+- [x] 🏪 **Shop system** — Random item generation (value + rarity) 
 - [x] 🧳 **looting system** - Get loot when mobs get killed (random) 
 - [ ] ⚔️ **Skills, Buffs & Debuffs** — Data structure & effects 
 - [ ] 🔄 **Turn-based combat** — Core logic implementation  
@@ -51,6 +52,8 @@
 > **tree talent (Entity) :**  Tree talent.
 
 > **Enemy AI :** Create an AI 
+
+>**Game Future:** I think I'm gonna turn this game into Mage Class Game with elemental thing, mage could specialize into diff role : tank, support, dps
 
 ## 🛠️ Tech Stack
 - **Language:** Python 3.13
