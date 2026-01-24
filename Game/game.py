@@ -6,6 +6,7 @@ from Game.save_load import save_game, load_game, get_save_file, restore_player_d
 from Game.enemy_spawner import generate_random_enemy, get_enemy_actual_level
 from Game.items import weapons, armors, shop_items, Weapon, Armor, UseableItem,Catalyst, Shield
 from Game.shop_manager import Shop
+from Game.skills import DamageSkill,SupportSkill
 import random
 import copy
 
@@ -22,8 +23,7 @@ class Game:
         available_characters = {
             "1": characters["warrior"],
             "2": characters["mage"],
-            "3": characters["archer"],
-            "4": characters["easteregg"]
+            "3": characters["archer"]
             
         }
         # Boucle de sélection du personnage
@@ -49,6 +49,7 @@ class Game:
             print("1- Attaquer")
             print("2- Fuir")
             print("3- Inventaire")
+            print("4- Sorts")
             combat_choice = input("Votre choix : \n")
             
             if combat_choice == "1":
@@ -77,9 +78,17 @@ class Game:
             elif combat_choice == "3":
                 objet_utilise = self.show_inventory()
                 if objet_utilise == False:
-                    continue 
-            else:
-                print("choix invalide")    
+                    continue
+            elif combat_choice == "4":
+                if self.show_skills_menu(enemy):
+                    if enemy.health <=0:
+                        handle_victory(self.player,enemy)
+                        self.shop.refresh_shop(self.player)
+                        self.player.reroll_cost = 15
+                        break
+                    else:
+                        print(f"{enemy.name} Riposte !")
+                        fight(enemy, self.player)
                 
         for stat, total_bonus in self.player.active_buffs.items():
             new_stat = getattr(self.player, stat)
@@ -127,7 +136,51 @@ class Game:
                     print("Ce numéro n'est pas dans le sac.")
             else:
                 print("Choix invalide, veuillez choisir un chiffre.")
-                            
+                
+    def show_skills_menu(self,enemy):
+        skills = self.player.skills
+        checking_skills = True
+        while checking_skills:
+            if len(skills) == 0:
+                print("\n Vous n'avez pas de sort...\n")
+                return False
+            if self.player.mana == 0:
+                print("Vous n'avez plus de mana")
+                return False
+
+            print("\n--- Votre inventaire de sortilèges ---\n")
+            sorted_spells = sorted(skills, key=lambda x: x.name)
+
+            for i, skills in enumerate(sorted_spells):
+                print(f"{i + 1}. {skills.name} | {skills.power} points de dégats| Coût: {skills.mana_cost}/{self.player.mana} mana du joueur actuel | {skills.description}")
+            print(f"{len(sorted_spells) + 1}. Retour au menu")
+
+            choice = input("\nQuel sort voulez-vous lancer ?\n")
+            if choice.isdigit():
+                index = int(choice)
+                if index == len(sorted_spells) + 1:
+                    return False
+                index -= 1
+                if 0 <= index < len(sorted_spells):
+                    selected_skills = sorted_spells[index]
+                    if not self.player.mana >= selected_skills.mana_cost:
+                        print("Vous n'avez pas assez de mana")
+                        return False
+                    else:
+                        if isinstance(selected_skills,DamageSkill):
+                            shoot, damages = selected_skills.cast(self.player,enemy)
+                            if shoot:
+                                print(f"\n✨ {self.player.name} incante {selected_skills.name} !")
+                                print(f"💥 {enemy.name} subit {damages} points de dégâts magiques.")
+                                print(f"❤️ Vie restante de {enemy.name} : {enemy.health}/{enemy.max_health}")
+                            return True
+                        elif isinstance(selected_skills,(SupportSkill)):
+                            pass #later
+                        #pas besoin de else, le sort appartiendra forcément a une catégorie
+                else:
+                    print("Ce numéro n'est pas dans le sac.")
+            else:
+                print("Choix invalide, veuillez choisir un chiffre.")                        
     def menu(self):
         self.select_character()
         

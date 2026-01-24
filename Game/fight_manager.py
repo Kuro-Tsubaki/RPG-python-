@@ -1,4 +1,4 @@
-from Game.character import Entity, Character
+
 from Game.items import all_items, Weapon, Shield, Catalyst
 import random 
 
@@ -11,7 +11,7 @@ def get_dice_result():
     elif dice_roll == 1:
         return 0.5
     else:
-        return 1
+        return 1 + (dice_roll/100)
 
 def calculate_defense(defender):
     defender_defense = 0
@@ -46,8 +46,8 @@ def calculate_defense(defender):
         
     return reduction, defense_display, defender_defense
 
-def fight(striker:Entity, defender:Entity):
-    
+def fight(striker: "Entity", defender: "Entity"): # pyright: ignore[reportUndefinedVariable]
+    from Game.character import Entity
     
     # === Case - Attaque === #
     
@@ -71,7 +71,7 @@ def fight(striker:Entity, defender:Entity):
        
     # Mastery
     
-    if isinstance(striker, Character) and isinstance(defender, Entity):
+    if hasattr(striker, "bestiary"):
         
         kill_count = striker.bestiary.get(defender.name, 0)
         

@@ -1,4 +1,5 @@
 from Game.items import (weapons, shields, catalysts,armors, potions, Weapon, Armor, UseableItem,Shield,Catalyst,)
+from Game.skills import spells_list
 import random
 class Entity:
     def __init__(self, name, health, strength,magic_power,mana=100, main_hand:Weapon=None, off_hand:Weapon=None,
@@ -112,14 +113,14 @@ class Character(Entity):
     def equip(self, item):
         target_slot = ""
         
-        # Étape 1 : Identification du tiroir (Slot)
+        
         if isinstance(item, (Weapon,Shield,Catalyst)):
             choix = input(f"Equiper {item.name} en : 1. Main principale / 2. Main secondaire ? ")
             target_slot = "main_hand" if choix == "1" else "off_hand"
         elif hasattr(item, 'slot') and item.slot != "":
-            target_slot = item.slot # On récupère l'étiquette fixe de l'armure
+            target_slot = item.slot # get armor tag 
             
-        # Étape 2 : L'échange
+        
         if target_slot:
             old_item = getattr(self, target_slot)
             
@@ -134,7 +135,7 @@ class Character(Entity):
         else:
             print(f"{item.name} n'a pas d'emplacement attitré")
             
-
+    
 class Warrior(Character):
     def level_up(self):
         super().level_up()
@@ -167,7 +168,7 @@ characters = {
                  chestplate=armors["chestplate"], 
                  leggings=armors["leggings"], 
                  boots=armors["boots"],
-                 inventory=[potions["mana_potion"], potions["health_potion"]])
+                 inventory=[potions["mana_potion"], potions["health_potion"]],skills=[spells_list["fireball"],spells_list["snowball"]])
 
 ,"archer" : Archer("Archer", health=80, strength=9,magic_power=0,mana=100,
                   main_hand=weapons["wooden_bow"], off_hand=weapons["wooden_trap"],
@@ -180,7 +181,7 @@ characters = {
         
 class Enemy(Entity):
     def __init__(self, name, health, strength,magic_power=0,mana=0,main_hand:Weapon=None, off_hand:Weapon=None,
-                 helmet:Armor=None, chestplate:Armor=None, leggings:Armor=None, boots:Armor=None, level=1, base_xp=0,loot_table=None,skills = []):
+                 helmet:Armor=None, chestplate:Armor=None, leggings:Armor=None, boots:Armor=None, level=1, base_xp=0,loot_table=None,skills= []):
         super().__init__(name, health, strength,magic_power,mana, main_hand, off_hand,
                         helmet, chestplate, leggings, boots ,level=level, base_xp=base_xp, skills=skills)
         

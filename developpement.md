@@ -50,6 +50,7 @@
  
 > **tree talent (Entity) :**  Tree talent.
 
+> **Enemy AI :** Create an AI 
 
 ## 🛠️ Tech Stack
 - **Language:** Python 3.13
