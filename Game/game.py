@@ -168,15 +168,18 @@ class Game:
                         return False
                     else:
                         if isinstance(selected_skills,DamageSkill):
-                            shoot, damages = selected_skills.cast(self.player,enemy)
+                            shoot, damages = selected_skills.cast(self.player,enemy)    
                             if shoot:
                                 print(f"\n✨ {self.player.name} incante {selected_skills.name} !")
                                 print(f"💥 {enemy.name} subit {damages} points de dégâts magiques.")
                                 print(f"❤️ Vie restante de {enemy.name} : {enemy.health}/{enemy.max_health}")
                             return True
                         elif isinstance(selected_skills,(SupportSkill)):
-                            pass #later
-                        #pas besoin de else, le sort appartiendra forcément a une catégorie
+                            shoot, heal = selected_skills.cast_support(self.player)
+                            if shoot:
+                                print(f"\n✨ {self.player.name} incante {selected_skills.name} !")
+                                print(f"{self.player.name} reçoit {selected_skills} point de vies, {self.player.health}/{self.player.max_health}")
+                            return True 
                 else:
                     print("Ce numéro n'est pas dans le sac.")
             else:
