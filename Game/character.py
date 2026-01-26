@@ -2,8 +2,12 @@ from Game.items import (weapons, shields, catalysts,armors, potions, Weapon, Arm
 from Game.skills import spells_list
 import random
 class Entity:
-    def __init__(self, name, health, strength,magic_power,mana=100, main_hand:Weapon=None, off_hand:Weapon=None,
-                 helmet:Armor=None, chestplate:Armor=None, leggings:Armor=None, boots:Armor=None, inventory:list[UseableItem]=[], level=1,xp=0, max_xp=100, base_xp=0, skills= []):
+    def __init__(self, name, health, strength, magic_power, mana=100, 
+                 main_hand:Weapon=None, off_hand:Weapon=None,
+                 helmet:Armor=None, chestplate:Armor=None, leggings:Armor=None, boots:Armor=None, inventory:list[UseableItem]=[], 
+                 level=1,xp=0, max_xp=100, base_xp=0, 
+                 skills= [], status_effects = {}):
+        
         self.name = name
         #Stat
         self.health = health
@@ -32,8 +36,10 @@ class Entity:
         self.shop_locked = False
         self.reroll_cost = 15
         self.shop_slots = [None] * 4
-        #---
+        #skills
         self.skills = skills
+        self.status_effects = status_effects
+        
     def gain_xp(self, amount):
         self.xp += amount
         print(f"✨ XP : +{amount} (Total: {self.xp}/{self.max_xp})")
@@ -78,10 +84,12 @@ class Entity:
         return True
                 
 class Character(Entity):
-    def __init__(self, name, health, strength,magic_power,mana=100,main_hand:Weapon=None, off_hand:Weapon=None,
-                 helmet:Armor=None, chestplate:Armor=None, leggings:Armor=None, boots:Armor=None, inventory=[],level=1, base_xp=0, gold = 100, skills = []):
+    def __init__(self, name, health, strength,magic_power,mana=100,
+                 main_hand:Weapon=None, off_hand:Weapon=None, helmet:Armor=None, chestplate:Armor=None, leggings:Armor=None, boots:Armor=None, 
+                 inventory=[],level=1, base_xp=0, gold = 100, 
+                 skills = [], status_effects = {}):
         super().__init__(name, health, strength, magic_power,mana,main_hand, off_hand,
-                        helmet, chestplate, leggings, boots, inventory,level=level, base_xp=base_xp, skills=skills)
+                        helmet, chestplate, leggings, boots, inventory,level=level, base_xp=base_xp, skills=skills,status_effects=status_effects)
         #others
         self.gold = gold
         #stuff
@@ -112,7 +120,6 @@ class Character(Entity):
    
     def equip(self, item):
         target_slot = ""
-        
         
         if isinstance(item, (Weapon,Shield,Catalyst)):
             choix = input(f"Equiper {item.name} en : 1. Main principale / 2. Main secondaire ? ")
@@ -162,13 +169,10 @@ characters = {
                    inventory=[potions["health_potion"], potions["strength_potion"]])
 
 ,"mage": Mage("Mage", health=70, strength=4, magic_power=12,mana=100,
-                 main_hand=catalysts["magic_staff"], 
-                 off_hand=catalysts["spell_book"],
-                 helmet=armors["helmet"], 
-                 chestplate=armors["chestplate"], 
-                 leggings=armors["leggings"], 
-                 boots=armors["boots"],
-                 inventory=[potions["mana_potion"], potions["health_potion"]],skills=[spells_list["fireball"],spells_list["snowball"]])
+                 main_hand=catalysts["magic_staff"], off_hand=catalysts["spell_book"],
+                 helmet=armors["helmet"], chestplate=armors["chestplate"], leggings=armors["leggings"], boots=armors["boots"],
+                 inventory=[potions["mana_potion"], potions["health_potion"]]
+                 ,skills=[spells_list["fireball"],spells_list["snowball"]])
 
 ,"archer" : Archer("Archer", health=80, strength=9,magic_power=0,mana=100,
                   main_hand=weapons["wooden_bow"], off_hand=weapons["wooden_trap"],
@@ -180,8 +184,11 @@ characters = {
 
         
 class Enemy(Entity):
-    def __init__(self, name, health, strength,magic_power=0,mana=0,main_hand:Weapon=None, off_hand:Weapon=None,
-                 helmet:Armor=None, chestplate:Armor=None, leggings:Armor=None, boots:Armor=None, level=1, base_xp=0,loot_table=None,skills= []):
+    def __init__(self, name, health, strength,magic_power=0,mana=0,
+                 main_hand:Weapon=None, off_hand:Weapon=None,
+                 helmet:Armor=None, chestplate:Armor=None, leggings:Armor=None, boots:Armor=None, 
+                 level=1, base_xp=0,
+                 loot_table=None,skills= []):
         super().__init__(name, health, strength,magic_power,mana, main_hand, off_hand,
                         helmet, chestplate, leggings, boots ,level=level, base_xp=base_xp, skills=skills)
         
@@ -189,18 +196,22 @@ class Enemy(Entity):
         
         
 enemies = {
-"gobelin" : Enemy("Gobelin", health=45, strength=5,magic_power=0,mana=0, main_hand=weapons["poignard"], level=1, base_xp=5,loot_table={
+"gobelin" : Enemy("Gobelin", health=45, strength=5,magic_power=0,mana=0, 
+                  main_hand=weapons["poignard"], 
+                  level=1, base_xp=5,loot_table={
                       "health_potion": 25,
                       "tissu_abime": 50 
                   })
-,"orque" : Enemy("Orque", health=70, strength=15,magic_power=0,mana=0, main_hand=weapons["gourdin"], off_hand=shields["basic_shield"], level=1, base_xp=15,loot_table={
+,"orque" : Enemy("Orque", health=70, strength=15,magic_power=0,mana=0, 
+                 main_hand=weapons["gourdin"], off_hand=shields["basic_shield"], 
+                 level=1, base_xp=15,loot_table={
                       "health_potion": 50,
                       "dent_orque": 4  
                   })
 ,"troll" : Enemy("Troll", health=120, strength=30,magic_power=0,mana=0,
              main_hand=weapons["axe"], off_hand=shields["basic_shield"],
-             helmet=armors["helmet"], chestplate=armors["chestplate"],
-             leggings=armors["leggings"], boots=armors["boots"], level=1, base_xp=45, loot_table={
+             helmet=armors["helmet"], chestplate=armors["chestplate"], leggings=armors["leggings"], boots=armors["boots"], 
+             level=1, base_xp=45, loot_table={
                  "defenses": 30,
                  "ceinture": 10,
                  "os": 80
